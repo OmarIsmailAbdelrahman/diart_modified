@@ -10,9 +10,11 @@ from einops import rearrange
 from rx.subject import Subject
 from torchaudio.io import StreamReader
 from websocket_server import WebsocketServer
+import soundfile as sf
 
 from . import utils
 from .audio import FilePath, AudioLoader
+import time
 
 
 class AudioSource(ABC):
@@ -30,6 +32,7 @@ class AudioSource(ABC):
         self.uri = uri
         self.sample_rate = sample_rate
         self.stream = Subject()
+        print(f"sus {self.sample_rate} {self.uri} {self.stream}")
 
     @property
     def duration(self) -> Optional[float]:
@@ -161,13 +164,17 @@ class MicrophoneAudioSource(AudioSource):
             try:
                 sd.check_input_settings(device=device, samplerate=sr)
             except Exception:
+                print("Exception")
                 pass
             else:
                 best_sample_rate = sr
+                print(f"sr {sr}")
                 break
+        print(f"best_sample_rate {best_sample_rate}")
         super().__init__(f"input_device:{device}", best_sample_rate)
 
         # Determine block size in samples and create input stream
+        print(f"here {block_duration} self.sample_rate {self.sample_rate}")
         self.block_size = int(np.rint(block_duration * self.sample_rate))
         self._mic_stream = sd.InputStream(
             channels=1,
@@ -320,3 +327,85 @@ class AppleDeviceAudioSource(TorchStreamAudioSource):
         uri = f"apple_input_device:{device}"
         streamer = StreamReader(device, format="avfoundation")
         super().__init__(uri, sample_rate, streamer, stream_index, block_duration)
+
+
+#############################################################
+class WavFileAudioSource(AudioSource):
+    def __init__(self, uri: Text, sample_rate: int):
+        super().__init__(uri, sample_rate)
+        self.file = None
+        self.open_file()
+
+    def open_file(self):
+        self.file = sf.SoundFile(self.uri, 'r')
+        if self.file.samplerate != self.sample_rate:
+            raise ValueError(f"Sample rate of {self.uri} does not match {self.sample_rate}")
+
+    def read(self):
+        try:
+            while True:
+                data = self.file.read(1024, dtype='int16')
+                if len(data) == 0:
+                    break
+                self.stream.on_next(data.tobytes())
+        except Exception as e:
+            self.stream.on_error(e)
+        finally:
+            self.stream.on_completed()
+    def close(self):
+        if self.file:
+            self.file.close()
+            self.file = None
+
+class WavFileSimulatedMicrophoneAudioSource(AudioSource):
+    """Audio source that simulates a microphone by reading from a .wav file.
+
+    Parameters
+    ----------
+    uri: Text
+        Path to the .wav file.
+    block_duration: int
+        Duration of each emitted chunk in seconds.
+        Defaults to 0.5 seconds.
+    """
+
+    def __init__(
+        self,
+        uri: Text,
+        block_duration: float = 0.5,
+    ):
+        self.block_duration = block_duration
+        self.file = None
+        self.open_file(uri)
+        super().__init__(uri, self.file.samplerate)
+
+        # Determine block size in samples
+        self.block_size = int(np.rint(self.block_duration * self.sample_rate))
+        print(f"block size {self.block_size} duration {self.block_duration} sampling rate {self.sample_rate}")
+        self._queue = SimpleQueue()
+
+    def open_file(self, uri: Text):
+        self.file = sf.SoundFile(uri, 'r')
+        if self.file.samplerate not in [16000, 32000, 44100, 48000]:
+            raise ValueError(f"Unsupported sample rate: {self.file.samplerate}")
+
+    def read(self):
+        try:
+            while True:
+                data = self.file.read(self.block_size, dtype='int16')
+                if len(data) == 0:
+                    break
+                self.stream.on_next(data.tobytes())
+                time.sleep(self.block_duration)  # Add delay here
+                #print("stream")
+        except Exception as e:
+            self.stream.on_error(e)
+        finally:
+            self.stream.on_completed()
+            self.close()
+
+    def close(self):
+        time.sleep(2)
+        if self.file:
+            self.file.close()
+            self.file = None
