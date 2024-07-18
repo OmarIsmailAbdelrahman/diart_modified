@@ -222,12 +222,12 @@ def colorize_transcription(transcription):
 # Suppress whisper-timestamped warnings for a clean output
 logging.getLogger("whisper_timestamped").setLevel(logging.ERROR)
 
-def segmentation_loader():
-    return Model.from_pretrained("pyannote/segmentation-3.0")
-def embedding_loader():
-    return nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
-embedding = EmbeddingModel(embedding_loader)
-segmentation = SegmentationModel(segmentation_loader)
+#def segmentation_loader():
+#    return Model.from_pretrained("pyannote/segmentation-3.0")
+#def embedding_loader():
+#    return nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
+#embedding = EmbeddingModel(embedding_loader)
+#segmentation = SegmentationModel(segmentation_loader)
 
 config = SpeakerDiarizationConfig (
     duration=5,
@@ -236,8 +236,9 @@ config = SpeakerDiarizationConfig (
     tau_active=0.5,
     rho_update=0.1,
     delta_new=0.57,
-    embedding=embedding,
-    segmentation=segmentation,
+    segmentation=m.SegmentationModel.from_pretrained('pyannote/segmentation-3.0'),
+    embedding=m.EmbeddingModel.from_pretrained('nvidia/speakerverification_en_titanet_large'),
+    device=torch.device("cuda")
 
 )
 dia = SpeakerDiarization (config)
