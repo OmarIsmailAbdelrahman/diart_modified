@@ -123,7 +123,7 @@ class Wav2Vec2Transcriber:
         
         predicted_ids = torch.argmax(logits, dim=-1)
         transcription = self.processor.batch_decode(predicted_ids)[0]
-        print(f"output {transcription}")
+        #print(f"output {transcription}")
         return {"text": transcription}
 
     def identify_speakers(self, transcription, diarization, time_shift):
@@ -158,14 +158,14 @@ class Wav2Vec2Transcriber:
 
     def __call__(self, diarization, waveform):
         # Step 1: Transcribe
-        print(f"start ASR model")
+        #print(f"start ASR model")
         transcription = self.transcribe(waveform)
-        print(f"finished transcript")
+        #print(f"finished transcript")
         # Update transcription buffer
         self._buffer += transcription["text"]
         # The audio may not be the beginning of the conversation
         time_shift = waveform.sliding_window.start
-        print(f"time shifted")
+        #print(f"time shifted")
         # Step 2: Assign speakers
         speaker_transcriptions = self.identify_speakers(transcription["text"], diarization, time_shift)
         return speaker_transcriptions
