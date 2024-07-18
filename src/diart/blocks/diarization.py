@@ -186,8 +186,9 @@ class SpeakerDiarization(base.Pipeline):
         segmentations = self.segmentation(batch)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
-
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
+        
+        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation {segmentations.shape} embedding {embeddings.shape}")
 
         outputs = []
         for wav, seg, emb in zip(waveforms, segmentations, embeddings):
@@ -201,7 +202,7 @@ class SpeakerDiarization(base.Pipeline):
 
             # Update clustering state and permute segmentation
             permuted_seg = self.clustering(seg, emb)
-
+            print(f"legendary-SpeakerDiarization-__call__ permuted_seg {permuted_seg}")
             # Update sliding buffer
             self.chunk_buffer.append(wav)
             self.pred_buffer.append(permuted_seg)
@@ -210,7 +211,7 @@ class SpeakerDiarization(base.Pipeline):
             agg_waveform = self.audio_aggregation(self.chunk_buffer)
             agg_prediction = self.pred_aggregation(self.pred_buffer)
             agg_prediction = self.binarize(agg_prediction)
-
+            
             # Shift prediction timestamps if required
             if self.timestamp_shift != 0:
                 shifted_agg_prediction = Annotation(agg_prediction.uri)
