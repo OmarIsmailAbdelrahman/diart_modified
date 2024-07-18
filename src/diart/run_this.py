@@ -11,6 +11,7 @@ from datasets import load_dataset
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 import nemo.collections.asr as nemo_asr
 from diart.models import EmbeddingModel, SegmentationModel
+from pyannote.audio import Model
 
 processor = Wav2Vec2Processor.from_pretrained("othrif/wav2vec2-large-xlsr-egyptian")
 model = Wav2Vec2ForCTC.from_pretrained("othrif/wav2vec2-large-xlsr-egyptian")
