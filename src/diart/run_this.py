@@ -233,7 +233,7 @@ config = SpeakerDiarizationConfig (
 
 )
 dia = SpeakerDiarization (config)
-wav_file = "audio.wav"
+wav_file = "/kaggle/working/diart_modified/src/diart/audio.wav"
 source = WavFileSimulatedMicrophoneAudioSource(wav_file,0.1)
 
 asr = Wav2Vec2Transcriber()
