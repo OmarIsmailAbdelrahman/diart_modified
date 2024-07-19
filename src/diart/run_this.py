@@ -216,7 +216,9 @@ def colorize_transcription(transcription):
     return "\n".join(result)
 
 def print_output(x):
-    print(x.shape)
+    print(x.data.shape)
+    print(x.labels)
+    print(x.sliding_window.start x.sliding_window.end)
     return x
 ########################################
 
