@@ -216,9 +216,9 @@ def colorize_transcription(transcription):
     return "\n".join(result)
 
 def print_output(x):
-    print(x.data.shape)
-    print(x.labels)
-    print(x.sliding_window.start x.sliding_window.end)
+    print(f"Legendary output of rearrange_audio_stream is SlidingWindowFeature of data: {x.data.shape}")
+    print(f" labels {x.labels}")
+    print(f" sliding start {x.sliding_window.start} ending {x.sliding_window.end}")
     return x
 ########################################
 
