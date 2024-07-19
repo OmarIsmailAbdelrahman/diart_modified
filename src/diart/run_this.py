@@ -216,12 +216,12 @@ def colorize_transcription(transcription):
     return "\n".join(result)
 
 def print_output(x):
-    print(f"Legendary output of rearrange_audio_stream is SlidingWindowFeature of data: {x.data.shape}")
+    print(f"Legendary-print_output output of rearrange_audio_stream is SlidingWindowFeature of data: {x.data.shape}")
     print(f" labels {x.labels}")
     print(f" sliding start {x.sliding_window.start} ending {x.sliding_window.end}")
     return x
-def print_output1(x):
-    print(f"Legendary output of rearrange_audio_stream is SlidingWindowFeature of data: {x.data.shape}")
+def print2(x):
+    print(f"Legendary-print2 output of rearrange_audio_stream is SlidingWindowFeature of data: {np.array(x.data).shape}")
     print(f" labels {x.labels}")
     print(f" sliding start {x.sliding_window.start} ending {x.sliding_window.end}")
     return x
@@ -267,7 +267,7 @@ source.stream.pipe(
     ),
     ops.map(print_output),
     ops.buffer_with_count(count=batch_size),
-    ops.map(print_output1),
+    ops.map(print2),
     ops.map(dia),
     ops.map(concat),
     ops.filter(lambda ann_wav: ann_wav[0].get_timeline().duration() > 0),
