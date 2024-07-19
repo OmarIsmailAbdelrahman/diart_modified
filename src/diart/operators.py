@@ -69,16 +69,16 @@ def rearrange_audio_stream(
         )
 
         # Check for buffer overflow
-        print(f"Legendary-operators-accumulate buffer shape{buffer.shape} step_samples {step_samples} chunk_samples {chunk_samples}")
+        #print(f"Legendary-operators-accumulate buffer shape{buffer.shape} step_samples {step_samples} chunk_samples {chunk_samples}")
         if buffer.shape[1] >= step_samples:
             # Pop samples from buffer
             if buffer.shape[1] == step_samples:
                 new_chunk, new_buffer = buffer, None
-                print(f"Legendary-operators-accumulate after update buffer size () returned chunk shape {new_chunk.shape}")
+                #print(f"Legendary-operators-accumulate after update buffer size () returned chunk shape {new_chunk.shape}")
             else:
                 new_chunk = buffer[:, :step_samples]
                 new_buffer = buffer[:, step_samples:]
-                print(f"Legendary-operators-accumulate after update buffer size {new_buffer.shape} returned chunk shape {new_chunk}")
+                #print(f"Legendary-operators-accumulate after update buffer size {new_buffer.shape} returned chunk shape {new_chunk}")
 
             # Add samples to next chunk
             if state.chunk is not None:
