@@ -221,9 +221,7 @@ def print_output(x):
     print(f" sliding start {x.sliding_window.start} ending {x.sliding_window.end}")
     return x
 def print2(x):
-    print(f"Legendary-print2 output of rearrange_audio_stream is SlidingWindowFeature of data: {np.array(x.data).shape}")
-    print(f" labels {x.labels}")
-    print(f" sliding start {x.sliding_window.start} ending {x.sliding_window.end}")
+    print(f"Legendary-print2 output buffer_with_count {np.array(x).shape}")
     return x
 
 ########################################
