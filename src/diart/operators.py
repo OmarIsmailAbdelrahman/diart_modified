@@ -300,6 +300,7 @@ def buffer_output(
             window = SlidingWindow(
                 start=start_time, duration=resolution, step=resolution
             )
+            print(f"Legendary-operators-buffer_output waveform {waveform.shape}")
             waveform = SlidingWindowFeature(waveform, window)
 
         return OutputAccumulationState(annotation, waveform, real_time, new_next_sample)
