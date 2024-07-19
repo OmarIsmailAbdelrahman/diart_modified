@@ -74,9 +74,11 @@ def rearrange_audio_stream(
             # Pop samples from buffer
             if buffer.shape[1] == step_samples:
                 new_chunk, new_buffer = buffer, None
+                print(f"Legendary-operators-accumulate after update buffer size () returned chunk shape {new_chunk.shape}")
             else:
                 new_chunk = buffer[:, :step_samples]
                 new_buffer = buffer[:, step_samples:]
+                print(f"Legendary-operators-accumulate after update buffer size {new_buffer.shape} returned chunk shape {new_chunk}")
 
             # Add samples to next chunk
             if state.chunk is not None:
@@ -88,7 +90,6 @@ def rearrange_audio_stream(
                 start_time += step
 
             # Chunk has changed because of buffer overflow
-            print(f"Legendary-operators-accumulate after update buffer size {new_buffer.shape} returned chunk shape {new_chunk}")
             return AudioBufferState(new_chunk, new_buffer, start_time, changed=True)
 
         # Chunk has not changed
