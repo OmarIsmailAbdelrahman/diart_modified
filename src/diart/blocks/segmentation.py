@@ -39,10 +39,12 @@ class SpeakerSegmentation:
         speaker_segmentation: TemporalFeatures, shape (batch, frames, speakers)
             The batch dimension is omitted if waveform is a `SlidingWindowFeature`.
         """
+        print(f"Legendary-SpeakerSegmentation-__call__ waveform {waveform.shape}")
         with torch.no_grad():
             wave = rearrange(
                 self.formatter.cast(waveform),
                 "batch sample channel -> batch channel sample",
             )
             output = self.model(wave.to(self.device)).cpu()
+            print(f"Legendary-SpeakerSegmentation-__call__ output {output.shape}")
         return self.formatter.restore_type(output)
