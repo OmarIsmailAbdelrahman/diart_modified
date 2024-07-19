@@ -395,8 +395,8 @@ class WavFileSimulatedMicrophoneAudioSource(AudioSource):
                 data = self.file.read(self.block_size, dtype='int16')
                 if len(data) == 0:
                     break
-                print(f"Legendary-WavFileSimulatedMicrophoneAudioSource-read byte size {len(data)} np {np.array(data).shape}")
-                self.stream.on_next(data.tobytes())
+                print(f"Legendary-WavFileSimulatedMicrophoneAudioSource-read np {np.array(data).shape}")
+                self.stream.on_next(data)
                 time.sleep(self.block_duration)  # Add delay here
                 #print("stream")
         except Exception as e:
