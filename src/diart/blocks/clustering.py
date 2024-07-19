@@ -144,7 +144,7 @@ class OnlineSpeakerClustering:
         no_nan_embeddings = np.where(~np.isnan(embeddings).any(axis=1))[0]
         active_speakers = np.intersect1d(active_speakers, no_nan_embeddings)
 
-        num_local_speakers = segmentation.data.shape[1]
+        num_local_speakers = segmentation.data.shape[1] # the model is fixed by the number of speakers of the segmentation which is 3 in this case
 
         if self.centers is None:
             self.init_centers(embeddings.shape[1])
