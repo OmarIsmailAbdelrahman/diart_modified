@@ -92,7 +92,7 @@ class SpeakerDiarization(base.Pipeline):
 
         msg = f"Latency should be in the range [{self._config.step}, {self._config.duration}]"
         assert self._config.step <= self._config.latency <= self._config.duration, msg
-
+        print(f"Legendary-SpeakerDiarization- segmentation config {self._config.segmentation} ")
         self.segmentation = SpeakerSegmentation(
             self._config.segmentation, self._config.device
         )
