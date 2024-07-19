@@ -169,6 +169,8 @@ class SpeakerDiarization(base.Pipeline):
         Sequence[tuple[Annotation, SlidingWindowFeature]]
             Speaker diarization of each chunk alongside their corresponding audio.
         """
+        for wave in waveform:
+            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.shape}")
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg
