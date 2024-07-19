@@ -39,7 +39,7 @@ class SpeakerSegmentation:
         speaker_segmentation: TemporalFeatures, shape (batch, frames, speakers)
             The batch dimension is omitted if waveform is a `SlidingWindowFeature`.
         """
-        print(f"Legendary-SpeakerSegmentation-__call__ waveform {waveform.shape}")
+        #print(f"Legendary-SpeakerSegmentation-__call__ waveform {waveform.shape}")
         with torch.no_grad():
             wave = rearrange(
                 self.formatter.cast(waveform),
@@ -48,7 +48,7 @@ class SpeakerSegmentation:
             output = self.model(wave.to(self.device)).cpu()
             column_sums = tensor.sum(dim=[0, 1])
             non_zero_mask = column_sums != 0
-            print(f"Legendary-SpeakerSegmentation-__call__ output {output.shape}")
-            print(f"Legendary-SpeakerSegmentation-__call__ remove null {tensor[:, :, non_zero_mask]} {tensor[:, :, non_zero_mask].shape}")
+            #print(f"Legendary-SpeakerSegmentation-__call__ output {output.shape}")
+            #print(f"Legendary-SpeakerSegmentation-__call__ remove null {tensor[:, :, non_zero_mask]} {tensor[:, :, non_zero_mask].shape}")
 
         return self.formatter.restore_type(output)
