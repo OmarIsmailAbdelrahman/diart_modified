@@ -215,6 +215,9 @@ def colorize_transcription(transcription):
             result.append(f"[{colors[speaker]}]{text}")
     return "\n".join(result)
 
+def print_output(x):
+    print(x.shape)
+    return x
 ########################################
 
 
@@ -254,7 +257,9 @@ source.stream.pipe(
     dops.rearrange_audio_stream(
         config.duration, config.step, config.sample_rate
     ),
+    ops.map(print_output),
     ops.buffer_with_count(count=batch_size),
+    ops.map(print_output),
     ops.map(dia),
     ops.map(concat),
     ops.filter(lambda ann_wav: ann_wav[0].get_timeline().duration() > 0),
