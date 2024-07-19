@@ -52,7 +52,7 @@ def rearrange_audio_stream(
 
     def accumulate(state: AudioBufferState, value: np.ndarray):
         # State contains the last emitted chunk, the current step buffer and the last starting time
-        value = np.frombuffer(value, dtype=np.int16).reshape(1,-1).astype(np.float32) / 32768.0   
+        #value = np.frombuffer(value, dtype=np.int16).reshape(1,-1).astype(np.float32) / 32768.0   
         #print(f"accumulate {value} shape {value.shape}")
         if value.ndim != 2 or value.shape[0] != 1:
             raise ValueError(
