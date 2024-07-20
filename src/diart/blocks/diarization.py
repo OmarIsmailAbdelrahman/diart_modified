@@ -209,7 +209,7 @@ class SpeakerDiarization(base.Pipeline):
 
         
         input_signal = batch.reshape(1, -1).to(torch.float).to(device)
-        input_signal_length = input_signal[0]
+        input_signal_length = input_signal[:,0]
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
         vad_output = vad_model(input_signal=input_signal,
                                input_signal_length=input_signal_length)
