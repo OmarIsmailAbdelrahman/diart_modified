@@ -205,7 +205,7 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         
-        processed_signal = batch.reshape(batch_size, 1, -1).to(torch.float)
+        processed_signal = batch.reshape(batch_size, -1).to(torch.float)
         processed_signal_length = batch[:,:,0].reshape(-1)
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {processed_signal.shape} processed_signal_length {processed_signal_length} {processed_signal_length.shape}")
         output = vad_model(input_signal=processed_signal)
