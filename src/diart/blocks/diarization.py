@@ -17,6 +17,18 @@ from .segmentation import SpeakerSegmentation
 from .utils import Binarize
 from .. import models as m
 
+########################################################################################
+from pyannote.audio.pipelines import VoiceActivityDetection
+pipeline = VoiceActivityDetection(segmentation=model)
+HYPER_PARAMETERS = {
+  # remove speech regions shorter than that many seconds.
+  "min_duration_on": 0.0,
+  # fill non-speech regions shorter than that many seconds.
+  "min_duration_off": 0.0
+}
+pipeline.instantiate(HYPER_PARAMETERS)
+########################################################################################
+
 
 class SpeakerDiarizationConfig(base.PipelineConfig):
     def __init__(
@@ -174,7 +186,8 @@ class SpeakerDiarization(base.Pipeline):
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg
-
+        vad = pipeline("/kaggle/working/diart_modified/src/diart/audio.wav")
+        print(f"Legendary-diarization-__call__ vad {vad}")
         # Create batch from chunk sequence, shape (batch, samples, channels)
         batch = torch.stack([torch.from_numpy(w.data) for w in waveforms])
 
