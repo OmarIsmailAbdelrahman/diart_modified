@@ -18,20 +18,24 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
-from pyannote.audio import Model
-model = Model.from_pretrained(
-  "pyannote/segmentation-3.0")
+import nemo
+import nemo.collections.asr as nemo_asr
+vad_model = nemo_asr.models.EncDecClassificationModel.from_pretrained(model_name="MarbleNet-3x2x64")
+
+# from pyannote.audio import Model
+# model = Model.from_pretrained(
+#   "pyannote/segmentation-3.0")
 
 
-from pyannote.audio.pipelines import VoiceActivityDetection
-pipeline = VoiceActivityDetection(segmentation=model)
-HYPER_PARAMETERS = {
-  # remove speech regions shorter than that many seconds.
-  "min_duration_on": 0.0,
-  # fill non-speech regions shorter than that many seconds.
-  "min_duration_off": 0.0
-}
-pipeline.instantiate(HYPER_PARAMETERS)
+# from pyannote.audio.pipelines import VoiceActivityDetection
+# pipeline = VoiceActivityDetection(segmentation=model)
+# HYPER_PARAMETERS = {
+#   # remove speech regions shorter than that many seconds.
+#   "min_duration_on": 0.0,
+#   # fill non-speech regions shorter than that many seconds.
+#   "min_duration_off": 0.0
+# }
+# pipeline.instantiate(HYPER_PARAMETERS)
 ########################################################################################
 
 
@@ -191,7 +195,7 @@ class SpeakerDiarization(base.Pipeline):
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg 
-        vad = pipeline({"waveform": torch.tensor(wave.data).reshape(1,-1), "sample_rate": 16000})
+        vad = vad_model(wave.data)
         print(f"Legendary-diarization-__call__ vad {vad}")
         # Create batch from chunk sequence, shape (batch, samples, channels)
         batch = torch.stack([torch.from_numpy(w.data) for w in waveforms])
