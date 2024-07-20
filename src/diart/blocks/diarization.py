@@ -197,7 +197,7 @@ class SpeakerDiarization(base.Pipeline):
 
 
         output = inference({"waveform":batch.reshape(1,-1).to(torch.float), "sample_rate": 16000})############################################################################################################################################
-        print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.shape}")
+        print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.data.shape} start {output.sliding_window.start} ends {output.sliding_window.start}")
         segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
