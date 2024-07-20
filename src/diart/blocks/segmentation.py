@@ -46,9 +46,9 @@ class SpeakerSegmentation:
                 "batch sample channel -> batch channel sample",
             )
             output = self.model(wave.to(self.device)).cpu()
-            column_sums = torch.tensor.sum(dim=[0, 1])
-            non_zero_mask = column_sums != 0
+            #column_sums = torch.tensor.sum(dim=[0, 1])
+            #non_zero_mask = column_sums != 0
             print(f"Legendary-SpeakerSegmentation-__call__ output {output.shape}")
-            print(f"Legendary-SpeakerSegmentation-__call__ remove null {tensor[:, :, non_zero_mask]} {tensor[:, :, non_zero_mask].shape}")
+            #print(f"Legendary-SpeakerSegmentation-__call__ remove null {tensor[:, :, non_zero_mask]} {tensor[:, :, non_zero_mask].shape}")
 
         return self.formatter.restore_type(output)
