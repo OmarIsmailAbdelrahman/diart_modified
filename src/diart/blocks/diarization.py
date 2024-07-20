@@ -34,7 +34,6 @@ with open(config_path, 'r') as file:
     cfg = yaml.safe_load(file)
 
 vad_model = init_vad_model("vad_multilingual_marblenet")
-vad_model = vad_model.to(device)
 vad_model.eval()
 
 ########################################################################################
