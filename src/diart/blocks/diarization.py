@@ -192,7 +192,8 @@ class SpeakerDiarization(base.Pipeline):
         embeddings = self.embedding(batch, segmentations)
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
         
-        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation {segmentations.shape} {segmentations} {torch.max(segmentations, axis=2)}embedding {embeddings.shape}")
+        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation {segmentations.shape} {torch.max(segmentations, axis=2)} {torch.sum(torch.max(segmentations, axis=2))} {torch.max(segmentations, axis=2).shape}
+        embedding {embeddings.shape}")
 
         outputs = []
         for wav, seg, emb in zip(waveforms, segmentations, embeddings):
