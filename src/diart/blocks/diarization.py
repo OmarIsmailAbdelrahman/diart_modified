@@ -192,7 +192,7 @@ class SpeakerDiarization(base.Pipeline):
         embeddings = self.embedding(batch, segmentations)
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
         s = segmentations.numpy()
-        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation {s.shape} reduce to (batch,time) {np.max(s, axis=2).shape} {np.max(s, axis=2)} number of 1: {np.sum(np.max(s, axis=2))} embedding {s.shape}")
+        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation unique values {np.unique(s)} segmentation {s.shape} reduce to (batch,time) {np.max(s, axis=2).shape} {np.max(s, axis=2)} number of 1: {np.sum(np.max(s, axis=2)),axis=1} embedding {s.shape}")
 
         outputs = []
         for wav, seg, emb in zip(waveforms, segmentations, embeddings):
