@@ -18,6 +18,11 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
+from pyannote.audio import Model
+model = Model.from_pretrained(
+  "pyannote/segmentation-3.0")
+
+
 from pyannote.audio.pipelines import VoiceActivityDetection
 pipeline = VoiceActivityDetection(segmentation=model)
 HYPER_PARAMETERS = {
