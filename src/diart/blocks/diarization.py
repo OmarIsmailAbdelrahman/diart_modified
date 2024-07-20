@@ -35,8 +35,9 @@ config_path = "/kaggle/working/diart_modified/src/diart/vad_config.yaml"
 with open(config_path, 'r') as file:
     cfg = yaml.safe_load(file)
 
-vad_model = init_vad_model("vad_multilingual_marblenet",device=device)
+vad_model = init_vad_model("vad_multilingual_marblenet")
 vad_model.eval()
+vad_model.to(device)
 
 ########################################################################################
 
