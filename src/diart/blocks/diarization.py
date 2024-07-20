@@ -205,7 +205,7 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         
-        output = vad_model(processed_signal=batch.reshape(1,1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape)############################################################################################################################################
+        output = vad_model(processed_signal=batch.reshape(1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape)############################################################################################################################################
         print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.shape} start {output.start} ends {output.start}")
         segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
