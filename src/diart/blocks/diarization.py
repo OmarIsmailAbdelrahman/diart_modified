@@ -18,6 +18,12 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
+from pyannote.audio import Inference
+from pyannote.core import Segment
+
+# Initialize the VAD model
+vad_model = Inference("pyannote/voice-activity-detection", device=torch.device('cuda'))
+
 ########################################################################################
 
 
@@ -187,12 +193,23 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         # Extract segmentation and embeddings
-        segmentations = self.segmentation(batch)  # shape (batch, frames, speakers)
+        vad_scores = vad_model({"waveform": batch.reshape(-1), "sample_rate": 16000})
+        
+        # Convert raw scores to a timeline of speech segments
+        speech_timeline = vad_scores.to_timeline().support()
+        
+        # Print the detected voice activity segments
+        for segment in speech_timeline:
+            print(f"Start: {segment.start:.2f}s, End: {segment.end:.2f}s")
+
+        
+        segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
-        s = segmentations.numpy()
-        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation unique values {np.unique(s)} segmentation {s.shape} reduce to (batch,time) {np.max(s, axis=2).shape} {np.max(s, axis=2)} number of 1: {np.sum(np.max(s, axis=2),axis=1)} embedding {s.shape}")
+        # s = segmentations.numpy()
+        #print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation unique values {np.unique(s)} segmentation {s.shape} reduce to (batch,time) {np.max(s, axis=2).shape} {np.max(s, axis=2)} number of 1: {np.sum(np.max(s, axis=2),axis=1)} embedding {s.shape}")
+        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentations {s.shape} embeddings {embeddings.shape}")
 
         outputs = []
         for wav, seg, emb in zip(waveforms, segmentations, embeddings):
