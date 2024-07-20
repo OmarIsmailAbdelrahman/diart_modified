@@ -191,7 +191,7 @@ class SpeakerDiarization(base.Pipeline):
             Speaker diarization of each chunk alongside their corresponding audio.
         """
         for wave in waveforms:
-            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.shape}") 
+            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.shape} for vad shape {wave.data.reshape(1,-1).shape}") 
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg 
