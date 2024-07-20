@@ -22,7 +22,7 @@ from pyannote.audio import Inference
 from pyannote.core import Segment
 
 # Initialize the VAD model
-vad_model = Inference("pyannote/voice-activity-detection", device=torch.device('cuda'))
+vad_model = Inference("pyannote/voice-activity-detection", device=torch.device('cuda')وuse_auth_token="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")
 
 ########################################################################################
 
