@@ -208,7 +208,7 @@ class SpeakerDiarization(base.Pipeline):
         processed_signal = batch.reshape(batch_size, 1, -1).to(torch.float)
         processed_signal_length = batch[:,:,0].reshape(-1)
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {processed_signal.shape} processed_signal_length {processed_signal_length} {processed_signal_length.shape}")
-        output = vad_model(processed_signal=processed_signal)
+        output = vad_model(input_signal=processed_signal)
         #output = vad_model(processed_signal=batch.reshape(batch_size,1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape/batch_size)############################################################################################################################################
         print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.shape} start {output.start} ends {output.start}")
         segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
