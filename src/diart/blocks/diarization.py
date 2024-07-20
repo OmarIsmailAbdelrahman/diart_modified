@@ -18,6 +18,10 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
+import yaml
+import torch
+from pyannote.audio import Inference
+
 from nemo.collections.asr.parts.utils.vad_utils import (
     generate_overlap_vad_seq,
     generate_vad_frame_pred,
