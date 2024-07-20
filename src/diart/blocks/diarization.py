@@ -210,8 +210,9 @@ class SpeakerDiarization(base.Pipeline):
         
         input_signal = batch.reshape(1, -1).to(torch.float).to(device)
         input_signal_length = processed_signal[0]
-        print(f"legendary-SpeakerDiarization-__call__ processed_signal  {processed_signal.shape} processed_signal_length {input_signal_length}")
-        vad_output = vad_model(input_signal=processed_signal,input_signal_length=input_signal_length)
+        print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
+        vad_output = vad_model(input_signal=input_signal,
+                               input_signal_length=input_signal_length)
         #output = vad_model(processed_signal=batch.reshape(batch_size,1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape/batch_size)############################################################################################################################################
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
         probs = torch.softmax(log_probs, dim=-1)
