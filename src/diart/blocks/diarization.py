@@ -170,7 +170,7 @@ class SpeakerDiarization(base.Pipeline):
             Speaker diarization of each chunk alongside their corresponding audio.
         """
         for wave in waveforms:
-            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.shape}")
+            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.shape}") 
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg
@@ -194,6 +194,9 @@ class SpeakerDiarization(base.Pipeline):
 
         outputs = []
         for wav, seg, emb in zip(waveforms, segmentations, embeddings):
+            
+            print(f"legendary-SpeakerDiarization-__call__ wav {wav.data.shape} seg {seg.shape} emb {emb.shape}")
+            
             # Add timestamps to segmentation
             sw = SlidingWindow(
                 start=wav.extent.start,
