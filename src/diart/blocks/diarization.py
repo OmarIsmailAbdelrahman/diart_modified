@@ -40,8 +40,8 @@ vad_model = nemo_asr.models.EncDecClassificationModel.from_pretrained(model_name
 
 
 class SpeakerDiarizationConfig(base.PipelineConfig):
-    def __init__(
-        self,
+        def __init__(
+            self,
         segmentation: m.SegmentationModel | None = None,
         embedding: m.EmbeddingModel | None = None,
         duration: float = 5,
@@ -191,11 +191,11 @@ class SpeakerDiarization(base.Pipeline):
             Speaker diarization of each chunk alongside their corresponding audio.
         """
         for wave in waveforms:
-            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.shape} for vad shape {wave.data.reshape(1,-1).shape}") 
+            print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.squeeze().shape} for vad shape {wave.data.squeeze().reshape(1,-1).shape}") 
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg 
-        vad = vad_model.transcribe(wave.data.reshape(1,-1))
+        vad = vad_model.transcribe(wave.data.squeeze().reshape(1,-1))
         print(f"Legendary-diarization-__call__ vad {vad}")
         # Create batch from chunk sequence, shape (batch, samples, channels)
         batch = torch.stack([torch.from_numpy(w.data) for w in waveforms])
