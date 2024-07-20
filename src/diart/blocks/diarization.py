@@ -20,7 +20,7 @@ from .. import models as m
 ########################################################################################
 import nemo
 import nemo.collections.asr as nemo_asr
-vad_model = nemo_asr.models.EncDecClassificationModel.from_pretrained(model_name="MarbleNet-3x2x64")
+vad_model = nemo_asr.models.EncDecClassificationModel.from_pretrained(model_name="vad_telephony_marblenet")
 
 # from pyannote.audio import Model
 # model = Model.from_pretrained(
