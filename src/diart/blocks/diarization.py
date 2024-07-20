@@ -18,14 +18,20 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
-from pyannote.audio import Model
-from pyannote.audio import Inference
-from pyannote.core import Segment
+from nemo.collections.asr.parts.utils.vad_utils import (
+    generate_overlap_vad_seq,
+    generate_vad_frame_pred,
+    generate_vad_segment_table,
+    init_vad_model,
+    prepare_manifest,
+)
+config_path = "/kaggle/working/diart_modified/src/diart/vad_config.yaml"
+with open(config_path, 'r') as file:
+    cfg = yaml.safe_load(file)
 
-# Initialize the VAD model
-model = Model.from_pretrained("pyannote/segmentation-3.0", use_auth_token=True)
-from pyannote.audio import Inference
-inference = Inference(model, step=2.5)
+vad_model = init_vad_model(cfg.vad.model_path)
+vad_model = vad_model.to(device)
+vad_model.eval()
 
 ########################################################################################
 
@@ -195,9 +201,9 @@ class SpeakerDiarization(base.Pipeline):
         msg = f"Expected {expected_num_samples} samples per chunk, but got {batch.shape[1]}"
         assert batch.shape[1] == expected_num_samples, msg
 
-
-        output = inference({"waveform":batch.reshape(1,-1).to(torch.float), "sample_rate": 16000})############################################################################################################################################
-        print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.data.shape} start {output.sliding_window.start} ends {output.sliding_window.start}")
+        
+        output = vad_model(processed_signal=batch.reshape(1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape)############################################################################################################################################
+        print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.shape} start {output.start} ends {output.start}")
         segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
