@@ -191,7 +191,7 @@ class SpeakerDiarization(base.Pipeline):
         batch_size = len(waveforms)
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg
-        vad = pipeline(wave.data)
+        vad = pipeline({"audio":wave.data})
         print(f"Legendary-diarization-__call__ vad {vad}")
         # Create batch from chunk sequence, shape (batch, samples, channels)
         batch = torch.stack([torch.from_numpy(w.data) for w in waveforms])
