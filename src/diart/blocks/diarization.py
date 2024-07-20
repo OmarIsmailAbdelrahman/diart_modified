@@ -213,7 +213,7 @@ class SpeakerDiarization(base.Pipeline):
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {processed_signal.shape} processed_signal_length {processed_signal_length} {processed_signal_length}")
         output = vad_model(input_signal=processed_signal,input_signal_length=processed_signal_length)
         #output = vad_model(processed_signal=batch.reshape(batch_size,1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape/batch_size)############################################################################################################################################
-        print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.shape} start {output.start} ends {output.start}")
+        print(f"legendary-SpeakerDiarization-__call__ VAD output shape {output.shape} ")
         segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
