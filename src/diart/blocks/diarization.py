@@ -41,7 +41,7 @@ vad_model = nemo_asr.models.EncDecClassificationModel.from_pretrained(model_name
 
 class SpeakerDiarizationConfig(base.PipelineConfig):
         def __init__(
-            self,
+        self,
         segmentation: m.SegmentationModel | None = None,
         embedding: m.EmbeddingModel | None = None,
         duration: float = 5,
