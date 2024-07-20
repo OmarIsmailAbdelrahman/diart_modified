@@ -18,6 +18,8 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 import yaml
 import torch
 from pyannote.audio import Inference
@@ -33,7 +35,7 @@ config_path = "/kaggle/working/diart_modified/src/diart/vad_config.yaml"
 with open(config_path, 'r') as file:
     cfg = yaml.safe_load(file)
 
-vad_model = init_vad_model("vad_multilingual_marblenet")
+vad_model = init_vad_model("vad_multilingual_marblenet",device=device)
 vad_model.eval()
 
 ########################################################################################
@@ -205,7 +207,7 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         
-        processed_signal = batch.reshape(batch_size, -1).to(torch.float)
+        processed_signal = batch.reshape(batch_size, -1).to(torch.float).to(device)
         processed_signal_length = processed_signal.shape[1]
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {processed_signal.shape} processed_signal_length {processed_signal_length} {processed_signal_length}")
         output = vad_model(input_signal=processed_signal,input_signal_length=processed_signal_length)
