@@ -81,6 +81,7 @@ class OnlineSpeakerClustering:
         self.centers = np.zeros((self.max_speakers, dimension))
         self.active_centers = set()
         self.blocked_centers = set()
+        print(f"Legendary-OnlineSpeakerClustering-init_centers self.centers {self.centers.shape}")
 
     def update(self, assignments: Iterable[Tuple[int, int]], embeddings: np.ndarray):
         """Updates the speaker centroids given a list of assignments and local speaker embeddings
