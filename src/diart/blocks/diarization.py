@@ -18,11 +18,14 @@ from .utils import Binarize
 from .. import models as m
 
 ########################################################################################
+from pyannote.audio import Model
 from pyannote.audio import Inference
 from pyannote.core import Segment
 
 # Initialize the VAD model
-vad_model = Inference("pyannote/voice-activity-detection", device=torch.device('cuda'), use_auth_token="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")
+model = Model.from_pretrained("pyannote/segmentation-3.0", use_auth_token=True)
+from pyannote.audio import Inference
+inference = Inference(model, step=2.5)
 
 ########################################################################################
 
@@ -192,17 +195,9 @@ class SpeakerDiarization(base.Pipeline):
         msg = f"Expected {expected_num_samples} samples per chunk, but got {batch.shape[1]}"
         assert batch.shape[1] == expected_num_samples, msg
 
-        # Extract segmentation and embeddings
-        vad_scores = vad_model({"waveform": batch.reshape(-1), "sample_rate": 16000})
-        
-        # Convert raw scores to a timeline of speech segments
-        speech_timeline = vad_scores.to_timeline().support()
-        
-        # Print the detected voice activity segments
-        for segment in speech_timeline:
-            print(f"Start: {segment.start:.2f}s, End: {segment.end:.2f}s")
 
-        
+        output = inference(batch.reshape(-1))
+        print(f"legendary-SpeakerDiarization-__call__ {output} shape {output.shape}")
         segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
