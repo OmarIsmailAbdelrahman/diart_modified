@@ -303,7 +303,6 @@ class SpeakerDiarization(base.Pipeline):
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         segmentations = self.segmentation(batch)
-        segmentations = segmentations.reshape(-1,3)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
