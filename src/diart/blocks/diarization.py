@@ -241,8 +241,8 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         ############################################################
-        input_signal = batch.reshape(-1).to(torch.float).to(device)
-        temp = prepare_input_from_array(input_signal)
+        signal = batch.reshape(-1).to(torch.float).to(device)
+        temp = prepare_input_from_array(signal)
         input_signal , input_signal_length = torch.tensor(temp).reshape(1,temp.shape[0],-1), torch.tensor([temp.shape[1] for i in range(temp.shape[0])]).long()
         #input_signal_length = [x.shape[0] for x in input_signal]
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length} shape {input_signal_length.shape}")
@@ -252,7 +252,7 @@ class SpeakerDiarization(base.Pipeline):
         probs = torch.softmax(vad_output, dim=-1)
         pred = probs[:, 1]
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {probs.shape} {pred.shape}")
-        vad_timestamp_results = convert_vad_into_timestamp(input_signal,pred)
+        vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
