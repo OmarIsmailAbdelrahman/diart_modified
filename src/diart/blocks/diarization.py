@@ -49,6 +49,27 @@ def prepare_input_from_array(audio):
     print(f"mfcc {mfcc.shape}")
     return torch.from_numpy(mfcc).to('cuda')
 
+def convert_vad_into_timestamp(audio_data,model_output_np):
+    sr = 16000
+    samples_per_frame = len(audio_data) // model_output_np.shape[0]
+
+    # Initialize an array to hold the probabilities for each timestamp
+    probabilities = np.zeros(len(audio_data))
+    
+    # Assign probabilities to each frame
+    for i in range(model_output_np.shape[0]):
+        start_idx = i * samples_per_frame
+        end_idx = start_idx + samples_per_frame
+        prob_speech = model_output_np[i]  # Probability of speech for this frame
+        probabilities[start_idx:end_idx] = prob_speech
+    
+    # Ensure the last part of the signal is covered
+    if end_idx < len(audio_data):
+        probabilities[end_idx:] = model_output_np[-1]
+    
+    # The probabilities array now holds the speech probabilities for each timestamp in the original signal
+    print(probabilities)
+    return probabilities
 ########################################################################################
 
 
@@ -229,6 +250,7 @@ class SpeakerDiarization(base.Pipeline):
         probs = torch.softmax(vad_output, dim=-1)
         pred = probs[:, 1]
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {probs.shape} {pred.shape}")
+        vad_timestamp_results = convert_vad_into_timestamp(input_signal,pred)
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
