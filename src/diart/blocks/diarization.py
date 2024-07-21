@@ -57,17 +57,23 @@ def convert_vad_into_timestamp(audio,model_output):
 
     # Initialize an array to hold the probabilities for each timestamp
     probabilities = np.zeros(len(audio))
-    
+    counts = np.zeros(len(audio_data))
+
     # Assign probabilities to each frame
     for i in range(model_output_np.shape[0]):
         start_idx = i * samples_per_frame
         end_idx = start_idx + samples_per_frame
         prob_speech = model_output_np[i]  # Probability of speech for this frame
-        probabilities[start_idx:end_idx] = prob_speech
+        prob_sums[start_idx:end_idx] += prob_speech
+        counts[start_idx:end_idx] += 1
     
     # Ensure the last part of the signal is covered
     if end_idx < len(audio_data):
-        probabilities[end_idx:] = model_output_np[-1]
+        prob_sums[end_idx:] += model_output_np[-1]
+        counts[end_idx:] += 1
+    
+    # Calculate the mean probability for each timestamp
+    probabilities = prob_sums / counts
     
     # The probabilities array now holds the speech probabilities for each timestamp in the original signal
     print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
