@@ -49,7 +49,9 @@ def prepare_input_from_array(audio):
     print(f"mfcc {mfcc.shape}")
     return torch.from_numpy(mfcc).to('cuda')
 
-def convert_vad_into_timestamp(audio_data,model_output_np):
+def convert_vad_into_timestamp(audio,model_output):
+    audio_data = audio.cpu().numpy()
+    model_output_np = model_output.cpu().numpy()
     sr = 16000
     samples_per_frame = len(audio_data) // model_output_np.shape[0]
 
