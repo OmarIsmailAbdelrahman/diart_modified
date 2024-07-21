@@ -156,7 +156,6 @@ def get_embeddings(subsegments):
     embeddings = []
     for segment in subsegments:        
         embedding = speaker_model.get_embedding(segment).detach().cpu().numpy()
-        print(f"get_embeddings {embedding.shape}")
         embeddings.append(embedding)
     return np.vstack(embeddings)
 
@@ -351,7 +350,8 @@ class SpeakerDiarization(base.Pipeline):
         self.global_offset += batch.reshape(-1) / 16000
         [print(f"subsegment {len(segment)}") for segment in subsegments]
         print("f Legendary subsegments {subsegments}")
-        get_embeddings(subsegments)
+        emd_tita_net = get_embeddings(subsegments)
+        print(f"Legendary emd_tita_net {emd_tita_net.shape}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
