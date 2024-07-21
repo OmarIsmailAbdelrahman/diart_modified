@@ -241,7 +241,7 @@ logging.getLogger("whisper_timestamped").setLevel(logging.ERROR)
 
 config = SpeakerDiarizationConfig (
     duration=5,
-    step=0.5,
+    step=1,
     latency="min",
     tau_active=0.5,
     rho_update=0.1,
@@ -257,7 +257,7 @@ source = WavFileSimulatedMicrophoneAudioSource(wav_file,0.1)
 
 asr = Wav2Vec2Transcriber()
 
-transcription_duration = 2
+transcription_duration = 1
 batch_size = int(transcription_duration // config.step)
 source.stream.pipe(
     dops.rearrange_audio_stream(
