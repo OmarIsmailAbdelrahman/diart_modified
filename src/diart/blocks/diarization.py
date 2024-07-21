@@ -257,7 +257,7 @@ class SpeakerDiarization(base.Pipeline):
         
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
         probs = torch.softmax(vad_output, dim=-1)
-        pred = probs[:, 1]
+        pred = probs[:, 0]
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
         vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
         ############################################################
