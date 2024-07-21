@@ -77,6 +77,7 @@ def convert_vad_into_timestamp(audio,model_output):
     
     # The probabilities array now holds the speech probabilities for each timestamp in the original signal
     print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
+    np.save('probabilities.npy', probabilities)
     return probabilities
 ########################################################################################
 
