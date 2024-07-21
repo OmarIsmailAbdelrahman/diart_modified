@@ -103,6 +103,15 @@ def get_vad_timestamps(audio):
         start.append(segment.start)
         end.append(segment.end)
     return start,end
+
+def segment_audio(audio, start_times, end_times, sample_rate=16000):
+    segments = []
+    for start, end in zip(start_times, end_times):
+        start_sample = int(start * sample_rate)
+        end_sample = int(end * sample_rate)
+        segments.append(audio[start_sample:end_sample])
+    return segments
+
 ########################################################################################
 
 
@@ -287,8 +296,9 @@ class SpeakerDiarization(base.Pipeline):
         # pred = probs[:, 0]
         # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
-        x,y = get_vad_timestamps(batch.reshape(-1))
-        print(x,y)
+        start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
+        segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
+        print(f" len(segments) {len(segments)}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
