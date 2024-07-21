@@ -19,7 +19,7 @@ from .. import models as m
 
 ########################################################################################
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+global_offset = 0
 # import yaml
 # import torch
 # from pyannote.audio import Inference
@@ -111,7 +111,7 @@ def segment_audio(audio, start_times, end_times, sample_rate=16000):
     for start, end in zip(start_times, end_times):
         start_sample = int(start * sample_rate)
         end_sample = int(end * sample_rate)
-        segments.append(audio[start_sample:end_sample])
+        segments.append((audio[start_sample:end_sample], start, end))
     return segments
 
 def get_subsegments(offset: float, window: float, shift: float, duration: float):
@@ -128,18 +128,23 @@ def get_subsegments(offset: float, window: float, shift: float, duration: float)
         start = offset + (slice_id + 1) * shift
     return subsegments
 
-def create_subsegments_from_segments(segments , sample_rate=16000, window=0.63, shift=0.08):
+def create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08):
     all_subsegments = []
     
-    for i, segment in enumerate(segments):
+    for segment, seg_start_time, seg_end_time in segments:
         duration = len(segment) / sample_rate
         subsegments = get_subsegments(0, window, shift, duration)
         subsegment_samples = [(int(start * sample_rate), int((start + length) * sample_rate)) for start, length in subsegments]
         
         for start_sample, end_sample in subsegment_samples:
-            all_subsegments.append(segment[start_sample:end_sample])
+            subsegment = segment[start_sample:end_sample]
+            subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
+            subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
+            all_subsegments.append((subsegment, subsegment_start_time, subsegment_end_time))
+            print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
     
     return all_subsegments
+
 
 ########################################################################################
 
@@ -327,9 +332,10 @@ class SpeakerDiarization(base.Pipeline):
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        [print(f"segment {len(segment)}") for segment in segments]
-        subsegments = create_subsegments_from_segments(segments, sample_rate=16000, window=0.63, shift=0.08)
-
+        [print(f"segment {len(segment)}") for segment in segments]        
+        subsegments = create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08)
+        global_offset += batch.reshape(-1) / 16000
+        [print(f"subsegment {len(segment)}") for segment in subsegments]        
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
