@@ -43,7 +43,7 @@ import librosa
 
 def prepare_input_from_array(audio):
     # Extract 64 MFCC features
-    temps = audio.to('cpu').numpy()
+    temp = audio.to('cpu').numpy()
     print(f"audio {audio.shape}")
     mfcc = librosa.feature.melspectrogram(y=temp, sr=16000, n_mels=2400, n_fft=400, hop_length=160)
     print(f"mfcc {mfcc.shape}")
