@@ -104,6 +104,8 @@ def get_vad_timestamps(audio):
         end.append(segment.end)
     return start,end
 
+import math
+
 def segment_audio(audio, start_times, end_times, sample_rate=16000):
     segments = []
     for start, end in zip(start_times, end_times):
