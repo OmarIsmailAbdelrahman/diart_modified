@@ -101,7 +101,7 @@ def get_vad_timestamps(audio):
     # save audio here
     sf.write(path, audio, 16000)
     
-    vad = pipeline(audio)
+    vad = pipeline({"waveform": audio.reshape(1,-1), "sample_rate": 16000})
     for segment in vad._tracks:
         start.append(segment.start)
         end.append(segment.end)
