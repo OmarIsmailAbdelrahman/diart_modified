@@ -31,7 +31,7 @@ from nemo.collections.asr.parts.utils.vad_utils import (
     init_vad_model,
     prepare_manifest,
 )
-config_path = "/kaggle/working/diart_modified/src/diart/vad_config.yaml"
+config_path = "/kaggle/working/output_inference/manifest_vad_input.json"
 with open(config_path, 'r') as file:
     cfg = yaml.safe_load(file)
 
