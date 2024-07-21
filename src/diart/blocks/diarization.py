@@ -51,7 +51,7 @@ def prepare_input_from_array(audio):
 
 def convert_vad_into_timestamp(audio,model_output):
     audio_data = audio.cpu().numpy()
-    model_output_np = model_output.cpu().numpy()
+    model_output_np = model_output.detach().cpu().numpy()
     sr = 16000
     samples_per_frame = len(audio_data) // model_output_np.shape[0]
 
