@@ -56,7 +56,7 @@ def convert_vad_into_timestamp(audio,model_output):
     samples_per_frame = len(audio_data) // model_output_np.shape[0]
 
     # Initialize an array to hold the probabilities for each timestamp
-    probabilities = np.zeros(len(audio))
+    prob_sums = np.zeros(len(audio_data))
     counts = np.zeros(len(audio_data))
 
     # Assign probabilities to each frame
