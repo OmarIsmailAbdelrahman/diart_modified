@@ -298,7 +298,7 @@ class SpeakerDiarization(base.Pipeline):
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        print(f" len(segments) {len(segments)}")
+        [print(f"segment len(segment)") for segment in segments]
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
