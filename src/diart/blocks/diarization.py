@@ -43,9 +43,9 @@ import librosa
 
 def prepare_input_from_array(audio):
     # Extract 64 MFCC features
-    temp = audio.to('cpu').numpy()
+    temps = audio.to('cpu').numpy()
     print(f"audio {audio.shape}")
-    mfcc = librosa.feature.melspectrogram(y=temp, sr=16000, n_mels=80,n_fft=400, hop_length=160)
+    mfcc = np.array([librosa.feature.melspectrogram(y=temp, sr=16000, n_mels=80,n_fft=400, hop_length=160) for temp in temps])
     print(f"mfcc {mfcc.shape}")
     return torch.from_numpy(mfcc).to('cuda')
 
@@ -248,7 +248,7 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         ############################################################
-        signal = batch.to(torch.float).to(device)
+        signal = batch.reshape(batch_size,-1).to(torch.float).to(device)
         print(f"Legendary signal shape {signal.shape}")
         temp = prepare_input_from_array(signal)
         print(f"Legendary temp shape {temp.shape}")
