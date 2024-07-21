@@ -208,8 +208,8 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         
-        input_signal = batch.reshape(1, -1).to(torch.float).to(device)
-        input_signal_length = torch.tensor(input_signal.shape[0]).long()
+        input_signal = batch.to(torch.float).to(device)
+        input_signal_length = [x.shape for x in input_signal]
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
         vad_output = vad_model(input_signal=input_signal,
                                input_signal_length=input_signal_length)
