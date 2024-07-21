@@ -39,6 +39,14 @@ vad_model = init_vad_model("vad_multilingual_marblenet")
 vad_model.eval()
 vad_model.to(device)
 
+import librosa
+
+def prepare_input_from_array(audio_data):
+    # Extract 64 MFCC features
+    mfcc = librosa.feature.melspectrogram(y=audio, sr=sample_rate, n_mels=64, fmax=8000)
+
+    return mfcc  # Transpose to shape (64, 64)
+
 ########################################################################################
 
 
@@ -207,17 +215,19 @@ class SpeakerDiarization(base.Pipeline):
         msg = f"Expected {expected_num_samples} samples per chunk, but got {batch.shape[1]}"
         assert batch.shape[1] == expected_num_samples, msg
 
+        ############################################################
+        input_signal = batch.reshape(batch_size,-1).to(torch.float).to(device)
+        input_signal_length = [x.shape[0] for x in input_signal]
+        print(f"Legendary-mel-features shape {prepare_input_from_array(input_signal).shape}")
+        print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
+        vad_output = vad_model(input_signal=input_signal,
+                               input_signal_length=input_signal_length)
+        print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
+        probs = torch.softmax(log_probs, dim=-1)
+        pred = probs[:, 1]
+        print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {probs.shape} {pred.shape}")
+        ############################################################
         
-        # input_signal = batch.reshape(batch_size,-1).to(torch.float).to(device)
-        # input_signal_length = [x.shape[0] for x in input_signal]
-        # print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
-        # vad_output = vad_model(input_signal=input_signal,
-        #                        input_signal_length=input_signal_length)
-        # #output = vad_model(processed_signal=batch.reshape(batch_size,1,-1).to(torch.float), processed_signal_length=batch.reshape(-1).shape/batch_size)############################################################################################################################################
-        # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
-        # probs = torch.softmax(log_probs, dim=-1)
-        # pred = probs[:, 1]
-
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         segmentations = self.segmentation(batch)
         # embeddings has shape (batch, speakers, emb_dim)
