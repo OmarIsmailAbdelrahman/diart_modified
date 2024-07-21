@@ -220,7 +220,7 @@ class SpeakerDiarization(base.Pipeline):
         ############################################################
         input_signal = batch.reshape(batch_size,-1).to(torch.float).to(device)
         temp = prepare_input_from_array(input_signal)
-        input_signal , input_signal_length = temp, temp.shape[0:1]
+        input_signal , input_signal_length = temp, torch.tensor(temp.shape[1]).long()
         #input_signal_length = [x.shape[0] for x in input_signal]
         print(f"Legendary-mel-features shape {prepare_input_from_array(input_signal).shape}")
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
