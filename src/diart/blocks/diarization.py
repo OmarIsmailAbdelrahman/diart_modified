@@ -112,6 +112,33 @@ def segment_audio(audio, start_times, end_times, sample_rate=16000):
         segments.append(audio[start_sample:end_sample])
     return segments
 
+def get_subsegments(offset: float, window: float, shift: float, duration: float):
+    subsegments: List[Tuple[float, float]] = []
+    start = offset
+    slice_end = start + duration
+    base = math.ceil((duration - window) / shift)
+    slices = 1 if base < 0 else base + 1
+    for slice_id in range(slices):
+        end = start + window
+        if end > slice_end:
+            end = slice_end
+        subsegments.append((start, end - start))
+        start = offset + (slice_id + 1) * shift
+    return subsegments
+
+def create_subsegments_from_segments(segments , sample_rate=16000, window=0.63, shift=0.08):
+    all_subsegments = []
+    
+    for i, segment in enumerate(segments):
+        duration = len(segment) / sample_rate
+        subsegments = get_subsegments(0, window, shift, duration)
+        subsegment_samples = [(int(start * sample_rate), int((start + length) * sample_rate)) for start, length in subsegments]
+        
+        for start_sample, end_sample in subsegment_samples:
+            all_subsegments.append(segment[start_sample:end_sample])
+    
+    return all_subsegments
+
 ########################################################################################
 
 
@@ -299,6 +326,8 @@ class SpeakerDiarization(base.Pipeline):
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         [print(f"segment {len(segment)}") for segment in segments]
+        subsegments = create_subsegments_from_segments(segments, sample_rate=16000, window=0.63, shift=0.08)
+
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
