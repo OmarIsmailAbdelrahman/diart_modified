@@ -96,7 +96,7 @@ pipeline.instantiate(HYPER_PARAMETERS)
 
 def get_vad_timestamps(audio):
     path = "./temp.wav"
-    strat = []
+    start = []
     end = []
     # save audio here
     sf.write(path, audio, 16000)
@@ -290,7 +290,8 @@ class SpeakerDiarization(base.Pipeline):
         # pred = probs[:, 0]
         # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
-        print(get_vad_timestamps(batch.reshape(-1)))
+        x,y = get_vad_timestamps(batch.reshape(-1))
+        print(x,y)
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
