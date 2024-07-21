@@ -220,7 +220,7 @@ class SpeakerDiarization(base.Pipeline):
         ############################################################
         input_signal = batch.reshape(-1).to(torch.float).to(device)
         temp = prepare_input_from_array(input_signal)
-        input_signal , input_signal_length = torch.tensor(temp).reshape(1,temp.shape[0],-1), torch.tensor(temp.shape[0]).long()
+        input_signal , input_signal_length = torch.tensor(temp).reshape(1,temp.shape[0],-1), torch.tensor(temp.shape[0]).reshape(1,-1).long()
         #input_signal_length = [x.shape[0] for x in input_signal]
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length} shape {input_signal_length.shape}")
         vad_output = vad_model(processed_signal=input_signal,processed_signal_length=input_signal_length)
