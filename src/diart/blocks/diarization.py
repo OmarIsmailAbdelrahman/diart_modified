@@ -218,7 +218,7 @@ class SpeakerDiarization(base.Pipeline):
         # probs = torch.softmax(log_probs, dim=-1)
         # pred = probs[:, 1]
 
-        segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
+        #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
