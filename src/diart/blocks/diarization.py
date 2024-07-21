@@ -248,21 +248,21 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         ############################################################
-        signal = batch.reshape(-1).to(torch.float).to(device)
-        print(f"Legendary signal shape {signal.shape}")
-        temp = prepare_input_from_array(signal)
-        print(f"Legendary temp shape {temp.shape}")
-        input_signal  = torch.tensor(temp).reshape(1,-1,temp.shape[0])
-        input_signal_length = torch.tensor([temp.shape[1] for i in range(temp.shape[0])]).long()
-        #input_signal_length = [x.shape[0] for x in input_signal]
-        print(f"legendary-SpeakerDiarization-__call__ input_signal  {input_signal.shape} processed_signal_length {input_signal_length} shape {input_signal_length.shape}")
-        vad_output = vad_model(processed_signal=input_signal,processed_signal_length=input_signal_length)
+        # signal = batch.reshape(-1).to(torch.float).to(device)
+        # print(f"Legendary signal shape {signal.shape}")
+        # temp = prepare_input_from_array(signal)
+        # print(f"Legendary temp shape {temp.shape}")
+        # input_signal  = torch.tensor(temp).reshape(1,-1,temp.shape[0])
+        # input_signal_length = torch.tensor([temp.shape[1] for i in range(temp.shape[0])]).long()
+        # #input_signal_length = [x.shape[0] for x in input_signal]
+        # print(f"legendary-SpeakerDiarization-__call__ input_signal  {input_signal.shape} processed_signal_length {input_signal_length} shape {input_signal_length.shape}")
+        # vad_output = vad_model(processed_signal=input_signal,processed_signal_length=input_signal_length)
         
-        print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
-        probs = torch.softmax(vad_output, dim=-1)
-        pred = probs[:, 0]
-        print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
-        vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
+        # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
+        # probs = torch.softmax(vad_output, dim=-1)
+        # pred = probs[:, 0]
+        # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
+        # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
