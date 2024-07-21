@@ -226,7 +226,7 @@ class SpeakerDiarization(base.Pipeline):
         vad_output = vad_model(processed_signal=input_signal,processed_signal_length=input_signal_length)
         
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
-        probs = torch.softmax(log_probs, dim=-1)
+        probs = torch.softmax(vad_output, dim=-1)
         pred = probs[:, 1]
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {probs.shape} {pred.shape}")
         ############################################################
