@@ -225,6 +225,8 @@ class SpeakerDiarization(base.Pipeline):
         print(f"Legendary-mel-features shape {prepare_input_from_array(input_signal).shape}")
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length}")
         help(vad_model())
+        import inspect
+        print(inspect.signature(vad_model()))
         vad_output = vad_model(input_signal,input_signal_length)
         print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
         probs = torch.softmax(log_probs, dim=-1)
