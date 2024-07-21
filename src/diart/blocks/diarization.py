@@ -133,7 +133,8 @@ def get_subsegments(offset: float, window: float, shift: float, duration: float)
 
 def create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08):
     all_subsegments = []
-    
+    all_subsegments_starts = []
+    all_subsegments_end = []
     for segment, seg_start_time, seg_end_time in segments:
         duration = len(segment) / sample_rate
         subsegments = get_subsegments(0, window, shift, duration)
@@ -143,10 +144,12 @@ def create_subsegments_from_segments(segments, global_offset, sample_rate=16000,
             subsegment = segment[start_sample:end_sample]
             subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
             subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
-            all_subsegments.append((subsegment, subsegment_start_time, subsegment_end_time))
+            all_subsegments.append(subsegment)
+            all_subsegments_starts.append(subsegment_start_time)
+            all_subsegments_end.append(subsegment_end_time)
             print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
     
-    return all_subsegments
+    return all_subsegments, all_subsegments_starts, all_subsegments_end
 
 # Function to get embeddings for each speech segment
 def get_embeddings(subsegments):
@@ -344,9 +347,10 @@ class SpeakerDiarization(base.Pipeline):
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         [print(f"segment {len(segment)}") for segment in segments]        
-        subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
+        subsegments,subseg_start, subseg_ends = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
         self.global_offset += batch.reshape(-1) / 16000
         [print(f"subsegment {len(segment)}") for segment in subsegments]
+        print("f Legendary subsegments {subsegments}")
         get_embeddings(subsegments)
         ############################################################
         
