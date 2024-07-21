@@ -251,7 +251,7 @@ class SpeakerDiarization(base.Pipeline):
         signal = batch.reshape(batch_size,-1).to(torch.float).to(device)
         print(f"Legendary signal shape {signal.shape}")
         temp = prepare_input_from_array(signal).permute(0, 2, 1)
-        print(f"Legendary temp shape {temp.shape}")[4,501, 2400]
+        print(f"Legendary temp shape {temp.shape}")
         input_signal , input_signal_length = torch.tensor(temp).reshape(batch_size,temp.shape[0],-1), torch.full((temp.shape[0], temp.shape[1]), temp.size(2)).long()
         #input_signal_length = [x.shape[0] for x in input_signal]
         print(f"legendary-SpeakerDiarization-__call__ processed_signal  {input_signal.shape} processed_signal_length {input_signal_length} shape {input_signal_length.shape}")
