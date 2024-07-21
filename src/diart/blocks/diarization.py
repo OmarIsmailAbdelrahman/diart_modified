@@ -41,7 +41,7 @@ vad_model.to(device)
 
 import librosa
 
-def prepare_input_from_array(audio_data):
+def prepare_input_from_array(audio):
     # Extract 64 MFCC features
     mfcc = librosa.feature.melspectrogram(y=audio, sr=sample_rate, n_mels=64, fmax=8000)
 
