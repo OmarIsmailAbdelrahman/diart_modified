@@ -20,65 +20,92 @@ from .. import models as m
 ########################################################################################
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-import yaml
-import torch
-from pyannote.audio import Inference
+# import yaml
+# import torch
+# from pyannote.audio import Inference
 
-from nemo.collections.asr.parts.utils.vad_utils import (
-    generate_overlap_vad_seq,
-    generate_vad_frame_pred,
-    generate_vad_segment_table,
-    init_vad_model,
-    prepare_manifest,
-)
-config_path = "/kaggle/working/change_vad_config.yaml"
-with open(config_path, 'r') as file:
-    cfg = yaml.safe_load(file)
+# from nemo.collections.asr.parts.utils.vad_utils import (
+#     generate_overlap_vad_seq,
+#     generate_vad_frame_pred,
+#     generate_vad_segment_table,
+#     init_vad_model,
+#     prepare_manifest,
+# )
+# config_path = "/kaggle/working/change_vad_config.yaml"
+# with open(config_path, 'r') as file:
+#     cfg = yaml.safe_load(file)
 
-vad_model = init_vad_model("vad_multilingual_marblenet")
-vad_model.eval()
-vad_model.to(device)
+# vad_model = init_vad_model("vad_multilingual_marblenet")
+# vad_model.eval()
+# vad_model.to(device)
 
-import librosa
+# import librosa
 
-def prepare_input_from_array(audio):
-    # Extract 64 MFCC features
-    temp = audio.to('cpu').numpy()
-    print(f"audio {audio.shape}")
-    mfcc = librosa.feature.melspectrogram(y=temp, sr=16000, n_mels=2400, n_fft=400, hop_length=160)
-    print(f"mfcc {mfcc.shape}")
-    return torch.from_numpy(mfcc).to('cuda')
+# def prepare_input_from_array(audio):
+#     # Extract 64 MFCC features
+#     temp = audio.to('cpu').numpy()
+#     print(f"audio {audio.shape}")
+#     mfcc = librosa.feature.melspectrogram(y=temp, sr=16000, n_mels=2400, n_fft=400, hop_length=160)
+#     print(f"mfcc {mfcc.shape}")
+#     return torch.from_numpy(mfcc).to('cuda')
 
-def convert_vad_into_timestamp(audio,model_output):
-    audio_data = audio.cpu().numpy()
-    model_output_np = model_output.detach().cpu().numpy()
-    sr = 16000
-    samples_per_frame = len(audio_data) // model_output_np.shape[0]
+# def convert_vad_into_timestamp(audio,model_output):
+#     audio_data = audio.cpu().numpy()
+#     model_output_np = model_output.detach().cpu().numpy()
+#     sr = 16000
+#     samples_per_frame = len(audio_data) // model_output_np.shape[0]
 
-    # Initialize an array to hold the probabilities for each timestamp
-    prob_sums = np.zeros(len(audio_data))
-    counts = np.zeros(len(audio_data))
+#     # Initialize an array to hold the probabilities for each timestamp
+#     prob_sums = np.zeros(len(audio_data))
+#     counts = np.zeros(len(audio_data))
 
-    # Assign probabilities to each frame
-    for i in range(model_output_np.shape[0]):
-        start_idx = i * samples_per_frame
-        end_idx = start_idx + samples_per_frame
-        prob_speech = model_output_np[i]  # Probability of speech for this frame
-        prob_sums[start_idx:end_idx] += prob_speech
-        counts[start_idx:end_idx] += 1
+#     # Assign probabilities to each frame
+#     for i in range(model_output_np.shape[0]):
+#         start_idx = i * samples_per_frame
+#         end_idx = start_idx + samples_per_frame
+#         prob_speech = model_output_np[i]  # Probability of speech for this frame
+#         prob_sums[start_idx:end_idx] += prob_speech
+#         counts[start_idx:end_idx] += 1
     
-    # Ensure the last part of the signal is covered
-    if end_idx < len(audio_data):
-        prob_sums[end_idx:] += model_output_np[-1]
-        counts[end_idx:] += 1
+#     # Ensure the last part of the signal is covered
+#     if end_idx < len(audio_data):
+#         prob_sums[end_idx:] += model_output_np[-1]
+#         counts[end_idx:] += 1
     
-    # Calculate the mean probability for each timestamp
-    probabilities = prob_sums / counts
+#     # Calculate the mean probability for each timestamp
+#     probabilities = prob_sums / counts
     
-    # The probabilities array now holds the speech probabilities for each timestamp in the original signal
-    print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
-    np.save('probabilities.npy', probabilities)
-    return probabilities
+#     # The probabilities array now holds the speech probabilities for each timestamp in the original signal
+#     print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
+#     np.save('probabilities.npy', probabilities)
+#     return probabilities
+from pyannote.audio import Model
+import soundfile as sf
+model = Model.from_pretrained("pyannote/segmentation")
+from pyannote.audio.pipelines import VoiceActivityDetection
+pipeline = VoiceActivityDetection(segmentation=model)
+HYPER_PARAMETERS = {
+  # onset/offset activation thresholds
+  "onset": 0.5, "offset": 0.5,
+  # remove speech regions shorter than that many seconds.
+  "min_duration_on": 0.0,
+  # fill non-speech regions shorter than that many seconds.
+  "min_duration_off": 0.0
+}
+pipeline.instantiate(HYPER_PARAMETERS)
+
+def get_vad_timestamps(audio):
+    path = "./temp.wav"
+    strat = []
+    end = []
+    # save audio here
+    sf.write(path, audio, 16000)
+    
+    vad = pipeline(path)
+    for segment in vad._tracks:
+        start.append(segment.start)
+        end.append(segment.end)
+    return start,end
 ########################################################################################
 
 
@@ -263,10 +290,12 @@ class SpeakerDiarization(base.Pipeline):
         # pred = probs[:, 0]
         # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
+        print(get_vad_timestamps(batch.reshape(-1)))
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
         segmentations = self.segmentation(batch)
+        segmentations = segmentations.reshape(-1,3)
         # embeddings has shape (batch, speakers, emb_dim)
         embeddings = self.embedding(batch, segmentations)
         seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
