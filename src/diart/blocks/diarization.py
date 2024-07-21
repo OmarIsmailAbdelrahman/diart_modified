@@ -95,12 +95,9 @@ HYPER_PARAMETERS = {
 pipeline.instantiate(HYPER_PARAMETERS)
 
 def get_vad_timestamps(audio):
-    path = "./temp.wav"
     start = []
     end = []
-    # save audio here
-    sf.write(path, audio, 16000)
-    
+    # save audio here    
     vad = pipeline({"waveform": audio.reshape(1,-1).to(torch.float), "sample_rate": 16000})
     for segment in vad._tracks:
         start.append(segment.start)
