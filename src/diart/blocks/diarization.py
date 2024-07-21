@@ -231,7 +231,7 @@ class SpeakerDiarizationConfig(base.PipelineConfig):
 class SpeakerDiarization(base.Pipeline):
     def __init__(self, config: SpeakerDiarizationConfig | None = None):
         self._config = SpeakerDiarizationConfig() if config is None else config
-
+        self.global_offset = 0
         msg = f"Latency should be in the range [{self._config.step}, {self._config.duration}]"
         assert self._config.step <= self._config.latency <= self._config.duration, msg
         print(f"Legendary-SpeakerDiarization- segmentation config {self._config.segmentation} ")
@@ -344,8 +344,8 @@ class SpeakerDiarization(base.Pipeline):
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         [print(f"segment {len(segment)}") for segment in segments]        
-        subsegments = create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08)
-        global_offset += batch.reshape(-1) / 16000
+        subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
+        self.global_offset += batch.reshape(-1) / 16000
         [print(f"subsegment {len(segment)}") for segment in subsegments]
         get_embeddings(subsegments)
         ############################################################
