@@ -79,6 +79,8 @@ global_offset = 0
 #     print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
 #     np.save('probabilities.npy', probabilities)
 #     return probabilities
+speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_large")
+
 from pyannote.audio import Model
 import soundfile as sf
 model = Model.from_pretrained("pyannote/segmentation")
@@ -145,6 +147,14 @@ def create_subsegments_from_segments(segments, global_offset, sample_rate=16000,
     
     return all_subsegments
 
+# Function to get embeddings for each speech segment
+def get_embeddings(subsegments):
+    embeddings = []
+    for segment in subsegments:        
+        embedding = speaker_model.get_embedding(segment).detach().cpu().numpy()
+        print(f"get_embeddings {embedding.shape}")
+        embeddings.append(embedding)
+    return np.vstack(embeddings)
 
 ########################################################################################
 
@@ -335,7 +345,8 @@ class SpeakerDiarization(base.Pipeline):
         [print(f"segment {len(segment)}") for segment in segments]        
         subsegments = create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08)
         global_offset += batch.reshape(-1) / 16000
-        [print(f"subsegment {len(segment)}") for segment in subsegments]        
+        [print(f"subsegment {len(segment)}") for segment in subsegments]
+        get_embeddings(subsegments)
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
