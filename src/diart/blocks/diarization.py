@@ -79,6 +79,7 @@ global_offset = 0
 #     print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
 #     np.save('probabilities.npy', probabilities)
 #     return probabilities
+from nemo.collections.asr.models import EncDecSpeakerLabelModel
 speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_large")
 
 from pyannote.audio import Model
