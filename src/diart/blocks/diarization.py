@@ -196,7 +196,7 @@ def apply_threshold(affinity_matrix, threshold=0.5):
     affinity_matrix[affinity_matrix < threshold] = 0
     return affinity_matrix
 
-def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.9):
+def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.99):
     # Apply threshold to affinity matrix
     thresholded_matrix = apply_threshold(affinity_matrix, threshold)
     
@@ -212,6 +212,7 @@ def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.9):
     est_num_speakers = len(set(clustering.labels_))
     print(f"number of speaker estimate {est_num_speakers}")
     return min(est_num_speakers, max_num_speakers)
+    
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
