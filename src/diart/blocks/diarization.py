@@ -216,6 +216,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
 from typing import List
 
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from typing import List
+
 class LoLClusteringAlgorithm:
     def __init__(self, max_points_per_cluster=10, recluster_condition_batches=5):
         self.max_points_per_cluster = max_points_per_cluster
@@ -224,6 +229,7 @@ class LoLClusteringAlgorithm:
         self.clusters = []  # List of clusters, each cluster is a list of points
         self.cluster_centroids = []  # List of centroids for each cluster
         self.batch_count = 0  # Count batches received
+        self.n_clusters = 2  # Initialize with a default value
 
     def add_embeddings(self, embeddings_batch):
         # Convert to numpy array if not already
@@ -232,20 +238,23 @@ class LoLClusteringAlgorithm:
         # Add new batch of embeddings to storage
         self.embeddings.extend(embeddings_batch)
         self.batch_count += 1
+        
         # Check if we should trigger re-clustering
         if self.batch_count >= self.recluster_condition_batches:
             self._recluster()
             self.batch_count = 0
-        # start K-means Cluster
-        self.cluster()    
+        
+        # Start K-means Cluster
+        self.cluster()
 
     def cluster(self):
         # Convert embeddings list to numpy array
         all_embeddings = np.vstack(self.embeddings)
-                
+        
         kmeans = KMeans(n_clusters=self.n_clusters, random_state=42)
         labels = kmeans.fit_predict(all_embeddings)
         print(f"labels {labels}")
+        
         # Clear current clusters and centroids
         self.clusters = [[] for _ in range(self.n_clusters)]
         self.cluster_centroids = kmeans.cluster_centers_
@@ -260,6 +269,9 @@ class LoLClusteringAlgorithm:
                 self._merge_cluster(cluster_idx)
                 
     def _recluster(self):
+        # Convert embeddings list to numpy array
+        all_embeddings = np.vstack(self.embeddings)
+        
         self.n_clusters = nmesc(calculate_affinity_matrix(all_embeddings))
         if self.n_clusters < 2:
             self.n_clusters = 2  # Ensure at least 2 clusters
