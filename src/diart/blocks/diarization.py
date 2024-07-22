@@ -296,7 +296,7 @@ class LoLClusteringAlgorithm:
         # Find the index of the nearest cluster
         nearest_cluster_idx = np.argmax(similarities)
     
-    return nearest_cluster_idx
+        return nearest_cluster_idx
 
     def get_clusters(self):
         return self.clusters
