@@ -161,8 +161,8 @@ def get_embeddings(subsegments):
     return np.vstack(embeddings)
 
 # Clustering Module
-from nemo.collections.asr.parts.utils.online_clustering import OnlineSpeakerClustering
-clustering_model = OnlineSpeakerClustering(
+from nemo.collections.asr.parts.utils.online_clustering import NemoOnlineSpeakerClustering
+clustering_model = NemoOnlineSpeakerClustering(
             max_num_speakers=8,
             max_rp_threshold=0.1,
             history_buffer_size=100,
