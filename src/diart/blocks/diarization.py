@@ -505,8 +505,8 @@ class SpeakerDiarization(base.Pipeline):
         
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
         print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
-        clusters = clustering.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
-        print(f"Legendary clusters pyaanote {clusters}")
+        # clusters = clustering.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
+        # print(f"Legendary clusters pyaanote {clusters}")
         self.global_offset += len(batch.reshape(-1)) / 16000 / batch_size
         
         lol_cluster.add_embeddings(emd_tita_net)
@@ -537,8 +537,6 @@ class SpeakerDiarization(base.Pipeline):
             seg = SlidingWindowFeature(seg.cpu().numpy(), sw)
 
             # Update clustering state and permute segmentation
-            print(f"clustering algorithm emb {emb.shape}")
-            print(f"clustering algorithm seg{emb.shape}")
             permuted_seg = self.clustering(seg, emb)
             print(f"legendary-SpeakerDiarization-__call__ permuted_seg {permuted_seg}")
             # Update sliding buffer
