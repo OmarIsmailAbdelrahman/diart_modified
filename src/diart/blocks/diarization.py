@@ -170,14 +170,14 @@ clustering_model = NemoOnlineSpeakerClustering(
             cuda=device,
         )
 
-from pyannote.audio.pipelines.clustering import AgglomerativeClustering
-clustering = AgglomerativeClustering().instantiate(
-    {
-        "method": "centroid",
-        "min_cluster_size": 12,
-        "threshold": 0.7045654963945799,
-    }
-)
+# from pyannote.audio.pipelines.clustering import AgglomerativeClustering
+# clustering_Agglomerative = AgglomerativeClustering().instantiate(
+#     {
+#         "method": "centroid",
+#         "min_cluster_size": 12,
+#         "threshold": 0.7045654963945799,
+#     }
+# )
 
 
 # clustering_model.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
@@ -243,11 +243,11 @@ class LoLClusteringAlgorithm:
         # Convert embeddings list to numpy array
         all_embeddings = np.vstack(self.embeddings)
                 
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+        kmeans = KMeans(n_clusters=self.n_clusters, random_state=42)
         labels = kmeans.fit_predict(all_embeddings)
         print(f"labels {labels}")
         # Clear current clusters and centroids
-        self.clusters = [[] for _ in range(n_clusters)]
+        self.clusters = [[] for _ in range(self.n_clusters)]
         self.cluster_centroids = kmeans.cluster_centers_
         
         # Assign embeddings to clusters based on labels
@@ -260,9 +260,9 @@ class LoLClusteringAlgorithm:
                 self._merge_cluster(cluster_idx)
                 
     def _recluster(self):
-        n_clusters = nmesc(calculate_affinity_matrix(all_embeddings))
-        if n_clusters < 2:
-            n_clusters = 2  # Ensure at least 2 clusters
+        self.n_clusters = nmesc(calculate_affinity_matrix(all_embeddings))
+        if self.n_clusters < 2:
+            self.n_clusters = 2  # Ensure at least 2 clusters
 
     def _merge_cluster(self, cluster_idx):
         cluster = self.clusters[cluster_idx]
@@ -507,7 +507,7 @@ class SpeakerDiarization(base.Pipeline):
         
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
         print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
-        # clusters = clustering.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
+        # clusters = clustering_Agglomerative.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
         # print(f"Legendary clusters pyaanote {clusters}")
         self.global_offset += len(batch.reshape(-1)) / 16000 / batch_size
         
