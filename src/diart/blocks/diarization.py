@@ -228,7 +228,7 @@ class LoLClusteringAlgorithm:
         self.embeddings = []  # Store all embeddings
         self.clusters = []  # List of clusters, each cluster is a list of points
         self.cluster_centroids = []  # List of centroids for each cluster
-        self.batch_count = 0  # Count batches received
+        self.batch_count = 5  # Count batches received, set to 5 to start the first number of clusters
         self.n_clusters = 2  # Initialize with a default value
 
     def add_embeddings(self, embeddings_batch):
@@ -297,7 +297,7 @@ class LoLClusteringAlgorithm:
         
         # Update the cluster centroid
         self.cluster_centroids[cluster_idx] = np.mean(np.vstack(cluster), axis=0)
-        print(f"self.cluster_centroids {self.cluster_centroids}")
+        print(f"self.cluster_centroids {np.array(self.cluster_centroids).shape}")
         
     def predict_cluster(self, new_embedding):
         # Convert to numpy array if not already
