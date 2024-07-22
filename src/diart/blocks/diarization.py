@@ -232,25 +232,20 @@ class LoLClusteringAlgorithm:
         # Add new batch of embeddings to storage
         self.embeddings.extend(embeddings_batch)
         self.batch_count += 1
-        
         # Check if we should trigger re-clustering
         if self.batch_count >= self.recluster_condition_batches:
             self._recluster()
             self.batch_count = 0
+        # start K-means Cluster
+        self.clutser()    
 
-    def _recluster(self):
+    def cluster(self):
         # Convert embeddings list to numpy array
         all_embeddings = np.vstack(self.embeddings)
-        
-        # Perform clustering (example using KMeans)
-        
-        n_clusters = nmesc(calculate_affinity_matrix(all_embeddings))
-        if n_clusters < 2:
-            n_clusters = 2  # Ensure at least 2 clusters
-        
+                
         kmeans = KMeans(n_clusters=n_clusters, random_state=42)
         labels = kmeans.fit_predict(all_embeddings)
-        
+        print(f"labels {labels}")
         # Clear current clusters and centroids
         self.clusters = [[] for _ in range(n_clusters)]
         self.cluster_centroids = kmeans.cluster_centers_
@@ -263,6 +258,11 @@ class LoLClusteringAlgorithm:
         for cluster_idx in range(len(self.clusters)):
             while len(self.clusters[cluster_idx]) > self.max_points_per_cluster:
                 self._merge_cluster(cluster_idx)
+                
+    def _recluster(self):
+        n_clusters = nmesc(calculate_affinity_matrix(all_embeddings))
+        if n_clusters < 2:
+            n_clusters = 2  # Ensure at least 2 clusters
 
     def _merge_cluster(self, cluster_idx):
         cluster = self.clusters[cluster_idx]
@@ -285,6 +285,7 @@ class LoLClusteringAlgorithm:
         
         # Update the cluster centroid
         self.cluster_centroids[cluster_idx] = np.mean(np.vstack(cluster), axis=0)
+        print(f"self.cluster_centroids {self.cluster_centroids}")
         
     def predict_cluster(self, new_embedding):
         # Convert to numpy array if not already
@@ -294,6 +295,7 @@ class LoLClusteringAlgorithm:
         similarities = [cosine_similarity(new_embedding, centroid.reshape(1, -1))[0, 0] for centroid in self.cluster_centroids]
         
         # Find the index of the nearest cluster
+        print(f"similarities {similarities}")
         nearest_cluster_idx = np.argmax(similarities)
     
         return nearest_cluster_idx
