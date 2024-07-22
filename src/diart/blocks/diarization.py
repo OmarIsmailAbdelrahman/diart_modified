@@ -80,8 +80,7 @@ global_offset = 0
 #     np.save('probabilities.npy', probabilities)
 #     return probabilities
 from nemo.collections.asr.models import EncDecSpeakerLabelModel
-speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_large")
-
+# VAD model
 from pyannote.audio import Model
 import soundfile as sf
 from pyannote.audio.pipelines import VoiceActivityDetection
@@ -109,7 +108,7 @@ def get_vad_timestamps(audio):
     return start,end
 
 import math
-
+# Segmentation Module
 def segment_audio(audio, start_times, end_times, sample_rate=16000):
     segments = []
     for start, end in zip(start_times, end_times):
@@ -152,7 +151,8 @@ def create_subsegments_from_segments(segments, global_offset, sample_rate=16000,
     
     return all_subsegments, all_subsegments_starts, all_subsegments_end
 
-# Function to get embeddings for each speech segment
+# Embedding Module "Titanet"
+speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_large")
 def get_embeddings(subsegments):
     embeddings = []
     for segment in subsegments:        
@@ -160,6 +160,17 @@ def get_embeddings(subsegments):
         embeddings.append(embedding)
     return np.vstack(embeddings)
 
+# Clustering Module
+from nemo.collections.asr.parts.utils.online_clustering import OnlineSpeakerClustering
+clustering_model = OnlineSpeakerClustering(
+            max_num_speakers=8,
+            max_rp_threshold=0.1,
+            sparse_search_volume=clustering_params.sparse_search_volume,
+            history_buffer_size=100,
+            current_buffer_size=100,
+            cuda=device,
+        )
+# online_clus.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
 ########################################################################################
 
 
