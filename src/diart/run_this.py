@@ -257,14 +257,14 @@ source = WavFileSimulatedMicrophoneAudioSource(wav_file,0.1)
 
 asr = Wav2Vec2Transcriber()
 
-transcription_duration = 1
+transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
 source.stream.pipe(
     dops.rearrange_audio_stream(
         config.duration, config.step, config.sample_rate
     ),
     ops.map(print_output),
-    ops.buffer_with_count(count=batch_size),
+    ops.buffer_with_count(count=1),
     ops.map(print2),
     ops.map(dia),
     ops.map(concat),
