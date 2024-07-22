@@ -84,8 +84,9 @@ speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_larg
 
 from pyannote.audio import Model
 import soundfile as sf
-model = Model.from_pretrained("pyannote/segmentation")
 from pyannote.audio.pipelines import VoiceActivityDetection
+
+model = Model.from_pretrained("pyannote/segmentation")
 pipeline = VoiceActivityDetection(segmentation=model)
 HYPER_PARAMETERS = {
   # onset/offset activation thresholds
@@ -343,13 +344,14 @@ class SpeakerDiarization(base.Pipeline):
         # pred = probs[:, 0]
         # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
+        
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        [print(f"segment {len(segment)}") for segment in segments]        
+        print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment) for segment in segments] }")
         subsegments,subseg_start, subseg_ends = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
         self.global_offset += batch.reshape(-1) / 16000
-        [print(f"subsegment {len(segment)}") for segment in subsegments]
-        print("f Legendary subsegments {subsegments}")
+        print(f"Legendary number of subSegments created from batch {len(subsegments)} segment sizes {[len(segment) for segment in subsegments] }")
+        
         emd_tita_net = get_embeddings(subsegments)
         print(f"Legendary emd_tita_net {emd_tita_net.shape}")
         ############################################################
