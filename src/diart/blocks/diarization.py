@@ -182,7 +182,134 @@ clustering = AgglomerativeClustering().instantiate(
 
 # clustering_model.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
 ########################################################################################
+# Clustring 
 
+def calculate_affinity_matrix(embeddings):
+    # Normalize embeddings
+    norm_embeddings = embeddings / np.linalg.norm(embeddings, axis=1, keepdims=True)
+    # Compute cosine similarity matrix
+    affinity_matrix = cosine_similarity(norm_embeddings)
+    return affinity_matrix
+
+def apply_threshold(affinity_matrix, threshold=0.5):
+    # Apply threshold to affinity matrix
+    affinity_matrix[affinity_matrix < threshold] = 0
+    return affinity_matrix
+
+def nmesc(affinity_matrix, max_num_speakers=10, threshold=0.5):
+    # Apply threshold to affinity matrix
+    thresholded_matrix = apply_threshold(affinity_matrix, threshold)
+    
+    # Apply clustering to the affinity matrix
+    clustering = AgglomerativeClustering(
+        n_clusters=None, 
+        affinity='precomputed', 
+        linkage='average', 
+        distance_threshold=1 - threshold
+    ).fit(1 - thresholded_matrix)
+    
+    # Estimate the number of distinct clusters (speakers)
+    est_num_speakers = len(set(clustering.labels_))
+    return min(est_num_speakers, max_num_speakers)
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import KMeans
+from typing import List
+
+class LoLClusteringAlgorithm:
+    def __init__(self, max_points_per_cluster=10, recluster_condition_batches=5):
+        self.max_points_per_cluster = max_points_per_cluster
+        self.recluster_condition_batches = recluster_condition_batches
+        self.embeddings = []  # Store all embeddings
+        self.clusters = []  # List of clusters, each cluster is a list of points
+        self.cluster_centroids = []  # List of centroids for each cluster
+        self.batch_count = 0  # Count batches received
+
+    def add_embeddings(self, embeddings_batch):
+        # Convert to numpy array if not already
+        embeddings_batch = np.array(embeddings_batch)
+        
+        # Add new batch of embeddings to storage
+        self.embeddings.extend(embeddings_batch)
+        self.batch_count += 1
+        
+        # Check if we should trigger re-clustering
+        if self.batch_count >= self.recluster_condition_batches:
+            self._recluster()
+            self.batch_count = 0
+
+    def _recluster(self):
+        # Convert embeddings list to numpy array
+        all_embeddings = np.vstack(self.embeddings)
+        
+        # Perform clustering (example using KMeans)
+        
+        n_clusters = nmesc(calculate_affinity_matrix(all_embeddings))
+        if n_clusters < 2:
+            n_clusters = 2  # Ensure at least 2 clusters
+        
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+        labels = kmeans.fit_predict(all_embeddings)
+        
+        # Clear current clusters and centroids
+        self.clusters = [[] for _ in range(n_clusters)]
+        self.cluster_centroids = kmeans.cluster_centers_
+        
+        # Assign embeddings to clusters based on labels
+        for idx, label in enumerate(labels):
+            self.clusters[label].append(all_embeddings[idx])
+        
+        # Combine clusters if they exceed max points per cluster
+        for cluster_idx in range(len(self.clusters)):
+            while len(self.clusters[cluster_idx]) > self.max_points_per_cluster:
+                self._merge_cluster(cluster_idx)
+
+    def _merge_cluster(self, cluster_idx):
+        cluster = self.clusters[cluster_idx]
+        
+        # Calculate pairwise similarities within the cluster
+        similarity_matrix = cosine_similarity(np.vstack(cluster))
+        
+        # Find the pair with the highest similarity
+        np.fill_diagonal(similarity_matrix, 0)  # Ignore self-similarity
+        max_sim_indices = np.unravel_index(np.argmax(similarity_matrix, axis=None), similarity_matrix.shape)
+        
+        # Combine the points with the highest similarity
+        point1_idx, point2_idx = max_sim_indices
+        combined_point = (cluster[point1_idx] + cluster[point2_idx]) / 2
+        
+        # Remove the original points and add the combined point
+        cluster.pop(max(point1_idx, point2_idx))
+        cluster.pop(min(point1_idx, point2_idx))
+        cluster.append(combined_point)
+        
+        # Update the cluster centroid
+        self.cluster_centroids[cluster_idx] = np.mean(np.vstack(cluster), axis=0)
+        
+    def predict_cluster(self, new_embedding):
+        # Convert to numpy array if not already
+        new_embedding = np.array(new_embedding).reshape(1, -1)
+        
+        # Calculate cosine similarity with each cluster centroid
+        similarities = [cosine_similarity(new_embedding, centroid.reshape(1, -1))[0, 0] for centroid in self.cluster_centroids]
+        
+        # Find the index of the nearest cluster
+        nearest_cluster_idx = np.argmax(similarities)
+    
+    return nearest_cluster_idx
+
+    def get_clusters(self):
+        return self.clusters
+
+    def get_cluster_centroids(self):
+        return self.cluster_centroids
+    
+lol_cluster = LoLClusteringAlgorithm(max_points_per_cluster=10, recluster_condition_batches=5)
+# clustering_algorithm.add_embeddings(batch_embeddings)
+# predicted_cluster = clustering_algorithm.predict_cluster(new_embedding)
+# print(f"Predicted cluster: {predicted_cluster}")
+
+##########################################################################################
 
 class SpeakerDiarizationConfig(base.PipelineConfig):
     def __init__(
@@ -381,6 +508,10 @@ class SpeakerDiarization(base.Pipeline):
         clusters = clustering.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
         print(f"Legendary clusters pyaanote {clusters}")
         self.global_offset += len(batch.reshape(-1)) / 16000 / batch_size
+        
+        lol_cluster.add_embeddings(emd_tita_net)
+        predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
+        print(f"Predicted cluster: {predicted_cluster}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
