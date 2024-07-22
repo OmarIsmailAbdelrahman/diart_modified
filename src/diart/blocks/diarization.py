@@ -253,7 +253,7 @@ class LoLClusteringAlgorithm:
         all_embeddings = np.vstack(self.embeddings)
         print(f"all_embeddings {all_embeddings.shape}")
         
-        kmeans = KMeans(n_clusters=self.n_clusters, random_state=42)
+        kmeans = KMeans(n_clusters=self.n_clusters)
         labels = kmeans.fit_predict(all_embeddings)
         print(f"clustering labels {labels}")
         
@@ -320,7 +320,7 @@ class LoLClusteringAlgorithm:
     def get_cluster_centroids(self):
         return self.cluster_centroids
     
-lol_cluster = LoLClusteringAlgorithm(max_points_per_cluster=10, recluster_condition_batches=5)
+lol_cluster = LoLClusteringAlgorithm(max_points_per_cluster=20, recluster_condition_batches=1)
 # clustering_algorithm.add_embeddings(batch_embeddings)
 # predicted_cluster = clustering_algorithm.predict_cluster(new_embedding)
 # print(f"Predicted cluster: {predicted_cluster}")
