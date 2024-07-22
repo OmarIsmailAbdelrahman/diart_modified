@@ -237,7 +237,7 @@ class LoLClusteringAlgorithm:
             self._recluster()
             self.batch_count = 0
         # start K-means Cluster
-        self.clutser()    
+        self.cluster()    
 
     def cluster(self):
         # Convert embeddings list to numpy array
