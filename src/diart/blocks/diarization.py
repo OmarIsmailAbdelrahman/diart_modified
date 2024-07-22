@@ -302,17 +302,18 @@ class LoLClusteringAlgorithm:
         self.cluster_centroids[cluster_idx] = np.mean(np.vstack(cluster), axis=0)
         print(f"self.cluster_centroids {np.array(self.cluster_centroids).shape}")
         
-def predict_cluster(self, new_embedding):
-    # Ensure new_embedding is a numpy array
-    new_embedding = np.array(new_embedding)
-    
-    # Calculate cosine similarity with each cluster centroid
-    similarities = cosine_similarity(new_embedding, self.cluster_centroids)
-    
-    # Find the index of the nearest cluster for each embedding in the batch
-    nearest_cluster_indices = np.argmax(similarities, axis=1)
-    
-    return nearest_cluster_indices
+    def predict_cluster(self, new_embedding):
+        # Ensure new_embedding is a numpy array
+        new_embedding = np.array(new_embedding)
+        
+        # Calculate cosine similarity with each cluster centroid
+        similarities = cosine_similarity(new_embedding, self.cluster_centroids)
+        
+        # Find the index of the nearest cluster for each embedding in the batch
+        nearest_cluster_indices = np.argmax(similarities, axis=1)
+        
+        return nearest_cluster_indices
+        
     def get_clusters(self):
         return self.clusters
 
