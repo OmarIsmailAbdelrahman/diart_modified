@@ -210,6 +210,7 @@ def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.5):
     
     # Estimate the number of distinct clusters (speakers)
     est_num_speakers = len(set(clustering.labels_))
+    print(f"number of speaker estimate {est_num_speakers}")
     return min(est_num_speakers, max_num_speakers)
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -245,15 +246,16 @@ class LoLClusteringAlgorithm:
             self.batch_count = 0
         
         # Start K-means Cluster
-        self.cluster()
+        return self.cluster()
 
     def cluster(self):
         # Convert embeddings list to numpy array
         all_embeddings = np.vstack(self.embeddings)
+        print(f"all_embeddings {all_embeddings.shape}")
         
         kmeans = KMeans(n_clusters=self.n_clusters, random_state=42)
         labels = kmeans.fit_predict(all_embeddings)
-        print(f"labels {labels}")
+        print(f"clustering labels {labels}")
         
         # Clear current clusters and centroids
         self.clusters = [[] for _ in range(self.n_clusters)]
@@ -267,6 +269,7 @@ class LoLClusteringAlgorithm:
         for cluster_idx in range(len(self.clusters)):
             while len(self.clusters[cluster_idx]) > self.max_points_per_cluster:
                 self._merge_cluster(cluster_idx)
+        return labels
                 
     def _recluster(self):
         # Convert embeddings list to numpy array
@@ -299,19 +302,17 @@ class LoLClusteringAlgorithm:
         self.cluster_centroids[cluster_idx] = np.mean(np.vstack(cluster), axis=0)
         print(f"self.cluster_centroids {np.array(self.cluster_centroids).shape}")
         
-    def predict_cluster(self, new_embedding):
-        # Convert to numpy array if not already
-        new_embedding = np.array(new_embedding).reshape(1, -1)
-        
-        # Calculate cosine similarity with each cluster centroid
-        similarities = [cosine_similarity(new_embedding, centroid.reshape(1, -1))[0, 0] for centroid in self.cluster_centroids]
-        
-        # Find the index of the nearest cluster
-        print(f"similarities {similarities}")
-        nearest_cluster_idx = np.argmax(similarities)
+def predict_cluster(self, new_embedding):
+    # Ensure new_embedding is a numpy array
+    new_embedding = np.array(new_embedding)
     
-        return nearest_cluster_idx
-
+    # Calculate cosine similarity with each cluster centroid
+    similarities = cosine_similarity(new_embedding, self.cluster_centroids)
+    
+    # Find the index of the nearest cluster for each embedding in the batch
+    nearest_cluster_indices = np.argmax(similarities, axis=1)
+    
+    return nearest_cluster_indices
     def get_clusters(self):
         return self.clusters
 
