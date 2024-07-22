@@ -363,10 +363,11 @@ class SpeakerDiarization(base.Pipeline):
         print(f"Legendary number of subSegments created from batch {len(subsegments)} segment sizes {[len(segment) for segment in subsegments] } global offset {self.global_offset}")
         
         emd_tita_net = get_embeddings(subsegments)
-        print(f"Legendary emd_tita_net {emd_tita_net.shape}")
-
+        index_vector = torch.arange(emd_tita_net.shape[0])
+        print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
+        
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
-        print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,torch.arange(emd_tita_net.shape[0]))}")
+        print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,index_vector)}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
