@@ -366,7 +366,7 @@ class SpeakerDiarization(base.Pipeline):
         print(f"Legendary emd_tita_net {emd_tita_net.shape}")
 
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
-        print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net)}")
+        print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,torch.arange(emd_tita_net.shape[0]))}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
