@@ -196,7 +196,7 @@ def apply_threshold(affinity_matrix, threshold=0.5):
     affinity_matrix[affinity_matrix < threshold] = 0
     return affinity_matrix
 
-def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.99):
+def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.2):
     # Apply threshold to affinity matrix
     thresholded_matrix = apply_threshold(affinity_matrix, threshold)
     
