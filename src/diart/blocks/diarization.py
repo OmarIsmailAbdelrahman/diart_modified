@@ -202,7 +202,7 @@ def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.5):
     
     # Apply clustering to the affinity matrix
     clustering = AgglomerativeClustering(
-        n_clusters=max_num_speakers, 
+        # n_clusters=max_num_speakers, 
         affinity='precomputed', 
         linkage='average', 
         distance_threshold=1 - threshold
