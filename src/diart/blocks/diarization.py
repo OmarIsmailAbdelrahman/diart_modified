@@ -196,13 +196,13 @@ def apply_threshold(affinity_matrix, threshold=0.5):
     affinity_matrix[affinity_matrix < threshold] = 0
     return affinity_matrix
 
-def nmesc(affinity_matrix, max_num_speakers=10, threshold=0.5):
+def nmesc(affinity_matrix, max_num_speakers=8, threshold=0.5):
     # Apply threshold to affinity matrix
     thresholded_matrix = apply_threshold(affinity_matrix, threshold)
     
     # Apply clustering to the affinity matrix
     clustering = AgglomerativeClustering(
-        n_clusters=None, 
+        n_clusters=max_num_speakers, 
         affinity='precomputed', 
         linkage='average', 
         distance_threshold=1 - threshold
