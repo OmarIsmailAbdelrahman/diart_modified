@@ -359,7 +359,7 @@ class SpeakerDiarization(base.Pipeline):
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] }")
         subsegments,subseg_start, subseg_ends = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
-        self.global_offset += len(batch.reshape(-1)) / 16000
+        self.global_offset += len(batch.reshape(-1)) / 16000 / batch_size
         print(f"Legendary number of subSegments created from batch {len(subsegments)} segment sizes {[len(segment) for segment in subsegments] } global offset {self.global_offset}")
         
         emd_tita_net = torch.tensor(get_embeddings(subsegments))
