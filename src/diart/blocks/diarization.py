@@ -406,6 +406,8 @@ class SpeakerDiarization(base.Pipeline):
             seg = SlidingWindowFeature(seg.cpu().numpy(), sw)
 
             # Update clustering state and permute segmentation
+            print(f"clustering algorithm emb {emb.shape}")
+            print(f"clustering algorithm seg{emb.shape}")
             permuted_seg = self.clustering(seg, emb)
             print(f"legendary-SpeakerDiarization-__call__ permuted_seg {permuted_seg}")
             # Update sliding buffer
