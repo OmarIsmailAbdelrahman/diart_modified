@@ -169,7 +169,7 @@ clustering_model = NemoOnlineSpeakerClustering(
             current_buffer_size=100,
             cuda=device,
         )
-# online_clus.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
+# clustering_model.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
 ########################################################################################
 
 
@@ -364,6 +364,9 @@ class SpeakerDiarization(base.Pipeline):
         
         emd_tita_net = get_embeddings(subsegments)
         print(f"Legendary emd_tita_net {emd_tita_net.shape}")
+
+        # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
+        print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
