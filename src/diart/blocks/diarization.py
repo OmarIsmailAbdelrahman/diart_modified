@@ -165,7 +165,6 @@ from nemo.collections.asr.parts.utils.online_clustering import OnlineSpeakerClus
 clustering_model = OnlineSpeakerClustering(
             max_num_speakers=8,
             max_rp_threshold=0.1,
-            sparse_search_volume=clustering_params.sparse_search_volume,
             history_buffer_size=100,
             current_buffer_size=100,
             cuda=device,
