@@ -174,7 +174,7 @@ batch_size = int(transcription_duration // config.step)
 sample_rate = 16000
 window = 5
 step_size = 0.5
-chunk_size = sample_rate * step_size
+chunk_size = int(sample_rate * step_size)  
 required_length = sample_rate * window
 
 def update_accumulated_data(acc, new_data):
