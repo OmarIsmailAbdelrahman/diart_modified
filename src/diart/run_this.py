@@ -175,10 +175,10 @@ asr = Wav2Vec2Transcriber()
 
 transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
-
+sample_rate = 16000
+window = 5
+required_length = sample_rate * window
 def update_accumulated_data(acc, new_data):
-    sample_rate = 16000
-    window = 5
     acc = np.concatenate((acc, new_data))
     if len(acc) > sample_rate * window:
         acc = acc[-required_length:]  # Keep only the latest `required_length` samples
@@ -191,7 +191,7 @@ def process_accumulated_data(data):
 
 source.stream.pipe(
     ops.scan(lambda acc, x: update_accumulated_data(acc, x), seed=np.array([])),  # Accumulate data
-    ops.filter(lambda x: len(x) >= 320000),  # Filter only when data length is >= 320000
+    ops.filter(lambda x: len(x) >= required_length),  # Filter only when data length is >= 320000
     ops.map(print_output),
     # ops.map(print2),
     ops.map(dia),
