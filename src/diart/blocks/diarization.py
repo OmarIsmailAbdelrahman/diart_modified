@@ -494,22 +494,6 @@ class SpeakerDiarization(base.Pipeline):
         assert batch.shape[1] == expected_num_samples, msg
 
         ############################################################
-        # signal = batch.reshape(-1).to(torch.float).to(device)
-        # print(f"Legendary signal shape {signal.shape}")
-        # temp = prepare_input_from_array(signal)
-        # print(f"Legendary temp shape {temp.shape}")
-        # input_signal  = torch.tensor(temp).reshape(1,-1,temp.shape[0])
-        # input_signal_length = torch.tensor([temp.shape[1] for i in range(temp.shape[0])]).long()
-        # #input_signal_length = [x.shape[0] for x in input_signal]
-        # print(f"legendary-SpeakerDiarization-__call__ input_signal  {input_signal.shape} processed_signal_length {input_signal_length} shape {input_signal_length.shape}")
-        # vad_output = vad_model(processed_signal=input_signal,processed_signal_length=input_signal_length)
-        
-        # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output {vad_output} shape {vad_output.shape} ")
-        # probs = torch.softmax(vad_output, dim=-1)
-        # pred = probs[:, 0]
-        # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
-        # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
-
         # Detect segments that contain activatiy
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
 
@@ -533,20 +517,12 @@ class SpeakerDiarization(base.Pipeline):
         
         self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
         print(f"global number {len(self.embedding_arr)}")
-        # index_vector = torch.arange(self.embedding_arr.shape[0])
         
-        # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
-        #print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
-        # clusters = clustering_Agglomerative.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
-        # print(f"Legendary clusters pyaanote {clusters}")
         self.global_offset += 0.5 # step size
         
-        #lol_cluster.add_embeddings(emd_tita_net)
-        #predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
-        #print(f"Predicted cluster: {predicted_cluster}")
         print(f" torch.tensor(self.embedding_arr) {torch.tensor(len(self.embedding_arr))} emd_tita_net {emd_tita_net.shape}")
         tempo = speaker_clustering.forward_infer(
-            embeddings_in_scales=torch.tensor([x[1] for x in self.embedding_arr]).to(torch.float),
+            embeddings_in_scales=torch.tensor([print(x[1].shape) for x in self.embedding_arr]).to(torch.float),
             timestamps_in_scales=torch.tensor([[x[3],x[4]] for x in self.embedding_arr]),
             multiscale_segment_counts= torch.tensor([len(self.embedding_arr)]),
             multiscale_weights=torch.tensor([1]),
@@ -557,7 +533,8 @@ class SpeakerDiarization(base.Pipeline):
             chunk_cluster_count=50,
             embeddings_per_chunk=10000,
         )
-        print(f"if it reached here, lol man, just lol {tempo}")
+        
+        print(f"if it reached here, lol man, just lol {tempo} shape {len(tempo)}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
