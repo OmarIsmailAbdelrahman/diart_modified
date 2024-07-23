@@ -432,7 +432,7 @@ class SpeakerDiarization(base.Pipeline):
         self.chunk_buffer, self.pred_buffer = [], []
         self.reset()
         self.embedding_arr = [] # added
-        self.seen_times = set()  # added
+        self.seen_times = []  # added
 
     @staticmethod
     def get_config_class() -> type:
