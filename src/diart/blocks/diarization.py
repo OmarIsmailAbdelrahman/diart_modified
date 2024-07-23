@@ -436,7 +436,7 @@ class SpeakerDiarization(base.Pipeline):
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         subsegments = self.create_subsegments_from_segments(segments, sample_rate=16000, window=0.5, shift=0.125)
         print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
-        print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset}")
+        print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset} increase by step {self._config.step}")
 
         # Calculate the Embedding
         emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
@@ -460,7 +460,7 @@ class SpeakerDiarization(base.Pipeline):
         self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
         print(f"global number of embedding {len(self.embedding_arr)}")
         
-        self.global_offset += 1 # step size
+        self.global_offset += self._config.step # step size
         print(f" emd_tita_net shape {emd_tita_net.shape}")
         clustering_prediction = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.stack([x[1] for x in self.embedding_arr]).to(torch.float),
