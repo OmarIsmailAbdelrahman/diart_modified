@@ -440,7 +440,7 @@ class SpeakerDiarization(base.Pipeline):
     def inside_interval(self,new_interval):
         start,end = new_interval
         for interval in self.seen_times:
-            interval_start,interval_ends = interval
+            interval_start,interval_ends = interval[0], interval[1]
             if start > interval_start and end < interval_ends:
                 return True
         return False
@@ -527,13 +527,14 @@ class SpeakerDiarization(base.Pipeline):
         for i in range(emd_tita_net.shape[0]):
             temp_segments,temp_start, temp_end = subsegments[i]
             if not self.inside_interval([temp_start,temp_end]): # if the segment is alread created don't add
-                print("add intervals:",temp_start,temp_end)
+                print("add sub-segments intervals:",temp_start,temp_end)
                 unique_subsegments.append((len(self.embedding_arr)+i,emd_tita_net[i],temp_segments,temp_start, temp_end))
         
         # adding the intervals to stop from creating redundent segments
         for i, j in zip(start_timestamps, end_timestamps):
             if not self.inside_interval([i, j]):
-                self.seen_times.append((i, j))
+                print("added intervals",[i, j])
+                self.seen_times.append([i, j])
 
         self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
         print(f"global number of embedding {len(self.embedding_arr)}")
