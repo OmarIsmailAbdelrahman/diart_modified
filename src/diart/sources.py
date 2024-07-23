@@ -382,12 +382,11 @@ class WavFileSimulatedMicrophoneAudioSource(AudioSource):
         # Determine block size in samples
         self.block_size = int(np.rint(self.block_duration * self.sample_rate))
         print(f"block size {self.block_size} duration {self.block_duration} sampling rate {self.sample_rate}")
-        self._queue = SimpleQueue()
 
     def open_file(self, uri: Text):
         self.file = sf.SoundFile(uri, 'r')
-        if self.file.samplerate not in [16000, 32000, 44100, 48000]:
-            raise ValueError(f"Unsupported sample rate: {self.file.samplerate}")
+        if self.file.samplerate not in [16000]:
+            raise ValueError(f"Unsupported sample rate: {self.file.samplerate} set it to 16000 first using the script")
 
     def read(self):
         try:
