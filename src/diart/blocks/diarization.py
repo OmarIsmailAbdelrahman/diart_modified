@@ -522,8 +522,8 @@ class SpeakerDiarization(base.Pipeline):
         
         print(f" torch.tensor(self.embedding_arr) {torch.tensor(len(self.embedding_arr))} emd_tita_net {emd_tita_net.shape}")
         tempo = speaker_clustering.forward_infer(
-            embeddings_in_scales=torch.tensor([print(x[1].shape) for x in self.embedding_arr]).to(torch.float),
-            timestamps_in_scales=torch.tensor([[x[3],x[4]] for x in self.embedding_arr]),
+            embeddings_in_scales=torch.stack([x[1] for x in self.embedding_arr]).to(torch.float),
+            timestamps_in_scales=torch.stack([[x[3],x[4]] for x in self.embedding_arr]),
             multiscale_segment_counts= torch.tensor([len(self.embedding_arr)]),
             multiscale_weights=torch.tensor([1]),
             oracle_num_speakers=-1,
