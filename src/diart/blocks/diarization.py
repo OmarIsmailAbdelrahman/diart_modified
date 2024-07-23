@@ -384,12 +384,11 @@ class SpeakerDiarization(base.Pipeline):
             subsegment_samples = [(int(start * sample_rate), int((start + length) * sample_rate)) for start, length in subsegments]
             
             for start_sample, end_sample in subsegment_samples:
-                if self.inside_interval([start_sample, end_sample]):
-                    print("continue")
-                    continue 
-                subsegment = segment[start_sample:end_sample]
                 subsegment_start_time = seg_start_time + (start_sample / sample_rate) + self.global_offset
                 subsegment_end_time = seg_start_time + (end_sample / sample_rate) + self.global_offset
+                if self.inside_interval([subsegment_start_time, subsegment_end_time]):
+                    continue 
+                subsegment = segment[start_sample:end_sample]
                 all_subsegments.append((subsegment,subsegment_start_time,subsegment_end_time))
                 print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
         
