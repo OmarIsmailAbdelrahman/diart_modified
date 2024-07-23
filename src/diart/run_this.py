@@ -109,6 +109,7 @@ import numpy as np
 from pyannote.core import Annotation, SlidingWindowFeature, SlidingWindow
 
 def splitter(x):
+    cluster_pred, emb_time, batch = x
     print(x)
     return x
 
