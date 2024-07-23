@@ -520,14 +520,14 @@ class SpeakerDiarization(base.Pipeline):
         unique_subsegments = []
         for i in range(emd_tita_net.shape[0]):
             temp_segments,temp_start, temp_end = subsegments[i]
-            if not inside_interval([temp_start,temp_end]): # if the segment is alread created don't add
+            if not self.inside_interval([temp_start,temp_end]): # if the segment is alread created don't add
                 print(temp_start,temp_end)
                 unique_subsegments.append((len(self.seen_times),emd_tita_net[i],temp_segments,temp_start, temp_end))
                 self.seen_times.add((temp_start, temp_end))
         
         # adding the intervals to stop from creating redundent segments
         for i, j in zip(start_timestamps, end_timestamps):
-            if not inside_interval([i, j]):
+            if not self.inside_interval([i, j]):
                 selfseen_times.append((i, j))
 
         self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
