@@ -139,6 +139,8 @@ def create_subsegments_from_segments(segments, global_offset, sample_rate=16000,
         subsegment_samples = [(int(start * sample_rate), int((start + length) * sample_rate)) for start, length in subsegments]
         
         for start_sample, end_sample in subsegment_samples:
+            if self.inside_interval([start_sample, end_sample]):
+               continue 
             subsegment = segment[start_sample:end_sample]
             subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
             subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
