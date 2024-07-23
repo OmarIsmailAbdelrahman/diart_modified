@@ -139,7 +139,7 @@ def print_output(x):
     return x
 def print2(x):
     print(f"Legendary-print2 output buffer_with_count {np.array(x).shape}")
-    return x
+    return "lol"
 
 ########################################
 
