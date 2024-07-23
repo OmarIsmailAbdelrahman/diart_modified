@@ -535,7 +535,7 @@ class SpeakerDiarization(base.Pipeline):
         self.embedding_arr = np.vstack((self.embedding_arr, emd_tita_net))
 
         tempo = speaker_clustering.forward_infer(
-            embeddings_in_scales=self.embedding_arr,
+            embeddings_in_scales=torch.tensor(self.embedding_arr),
             timestamps_in_scales=torch.tensor([[start,end]for start,end in zip(subseg_start, subseg_ends)]),
             multiscale_segment_counts= torch.tensor([emd_tita_net.shape[0]]),
             multiscale_weights=torch.tensor([1]),
