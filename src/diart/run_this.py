@@ -2,7 +2,8 @@ import logging
 import traceback
 import diart.operators as dops
 import rich
-import rx.operators as ops
+# import rx.operators as ops
+from rx import operators as ops
 from diart import SpeakerDiarization , SpeakerDiarizationConfig 
 from diart.sources import MicrophoneAudioSource, WavFileSimulatedMicrophoneAudioSource
 import torch
@@ -174,9 +175,23 @@ asr = Wav2Vec2Transcriber()
 
 transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
+
+def update_accumulated_data(acc, new_data):
+    required_length = 320000
+    acc = np.concatenate((acc, new_data))
+    if len(acc) > required_length:
+        acc = acc[-required_length:]  # Keep only the latest `required_length` samples
+    return acc
+    
+def process_accumulated_data(data):
+    # Process the accumulated data (e.g., print its length)
+    print(f"Processing data of length: {len(data)}")
+    return data
+
 source.stream.pipe(
+    ops.scan(lambda acc, x: update_accumulated_data(acc, x), seed=np.array([])),  # Accumulate data
+    ops.filter(lambda x: len(x) >= 320000),  # Filter only when data length is >= 320000
     ops.map(print_output),
-    # ops.buffer_with_count(count=1),
     # ops.map(print2),
     ops.map(dia),
     ops.map(splitter),
