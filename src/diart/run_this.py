@@ -173,10 +173,15 @@ transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
 sample_rate = 16000
 window = 5
+step_size = 0.5
+min_update_size = sample_rate * step_size
 required_length = sample_rate * window
+
 def update_accumulated_data(acc, new_data):
+    if len(new_data) < min_update_size:
+        return acc  # Skip updating if new_data size is less than min_update_size
     acc = np.concatenate((acc, new_data))
-    if len(acc) > sample_rate * window:
+    if len(acc) > required_length:
         acc = acc[-required_length:]  # Keep only the latest `required_length` samples
     return acc
     
