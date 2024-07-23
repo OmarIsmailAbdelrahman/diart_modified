@@ -133,7 +133,7 @@ def colorize_transcription(transcription):
     return "\n".join(result)
 
 def print_output(x):
-    print(x)
+    print(len(x))
     return x
 def print2(x):
     print(f"Legendary-print2 output buffer_with_count {np.array(x).shape}")
