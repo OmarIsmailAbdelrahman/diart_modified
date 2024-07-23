@@ -131,23 +131,6 @@ def get_subsegments(offset: float, window: float, shift: float, duration: float)
         start = offset + (slice_id + 1) * shift
     return subsegments
 
-def create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08):
-    all_subsegments = []
-    for segment, seg_start_time, seg_end_time in segments:
-        duration = len(segment) / sample_rate
-        subsegments = get_subsegments(0, window, shift, duration)
-        subsegment_samples = [(int(start * sample_rate), int((start + length) * sample_rate)) for start, length in subsegments]
-        
-        for start_sample, end_sample in subsegment_samples:
-            if self.inside_interval([start_sample, end_sample]):
-               continue 
-            subsegment = segment[start_sample:end_sample]
-            subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
-            subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
-            all_subsegments.append((subsegment,subsegment_start_time,subsegment_end_time))
-            print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
-    
-    return all_subsegments
 
 # Embedding Module "Titanet"
 speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_large")
@@ -461,7 +444,25 @@ class SpeakerDiarization(base.Pipeline):
             if start > interval_start and end < interval_ends:
                 return True
         return False
-            
+        
+    def create_subsegments_from_segments(self,segments, global_offset, sample_rate=16000, window=0.63, shift=0.08):
+    all_subsegments = []
+    for segment, seg_start_time, seg_end_time in segments:
+        duration = len(segment) / sample_rate
+        subsegments = get_subsegments(0, window, shift, duration)
+        subsegment_samples = [(int(start * sample_rate), int((start + length) * sample_rate)) for start, length in subsegments]
+        
+        for start_sample, end_sample in subsegment_samples:
+            if self.inside_interval([start_sample, end_sample]):
+               continue 
+            subsegment = segment[start_sample:end_sample]
+            subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
+            subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
+            all_subsegments.append((subsegment,subsegment_start_time,subsegment_end_time))
+            print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
+    
+    return all_subsegments
+        
                     
     def set_timestamp_shift(self, shift: float):
         self.timestamp_shift = shift
@@ -513,7 +514,7 @@ class SpeakerDiarization(base.Pipeline):
         
         # subsegment them on window 0.63 with shift 0.08
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.5, shift=0.125)
+        subsegments = self.create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.5, shift=0.125)
         print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset}")
 
