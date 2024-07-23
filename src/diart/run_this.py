@@ -110,7 +110,7 @@ from pyannote.core import Annotation, SlidingWindowFeature, SlidingWindow
 
 def splitter(x):
     cluster_pred, emb_time, batch = x
-    print(x)
+    print("splitter")
     return x
 
 def colorize_transcription(transcription):
