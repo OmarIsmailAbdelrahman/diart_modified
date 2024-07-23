@@ -32,7 +32,7 @@ class AudioSource(ABC):
         self.uri = uri
         self.sample_rate = sample_rate
         self.stream = Subject()
-        print(f"sus {self.sample_rate} {self.uri} {self.stream}")
+        print(f"sample rate {self.sample_rate} uri {self.uri} {self.stream}")
 
     @property
     def duration(self) -> Optional[float]:
@@ -394,18 +394,16 @@ class WavFileSimulatedMicrophoneAudioSource(AudioSource):
                 data = self.file.read(self.block_size, dtype='int16')
                 if len(data) == 0:
                     break
-                #print(f"Legendary-WavFileSimulatedMicrophoneAudioSource-read np {np.array(data).shape}")
                 self.stream.on_next(data)
                 time.sleep(self.block_duration)  # Add delay here
-                #print("stream")
         except Exception as e:
             self.stream.on_error(e)
         finally:
             self.stream.on_completed()
+            time.sleep(2)
             self.close()
 
     def close(self):
-        time.sleep(2)
         if self.file:
             self.file.close()
             self.file = None
