@@ -432,6 +432,7 @@ class SpeakerDiarization(base.Pipeline):
         self.chunk_buffer, self.pred_buffer = [], []
         self.reset()
         self.embedding_arr = np.empty((0, 192)) # added
+        self.seen_times = set()  # added
 
     @staticmethod
     def get_config_class() -> type:
@@ -517,10 +518,15 @@ class SpeakerDiarization(base.Pipeline):
         
         emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
         
+        unique_subsegments = []
         for i in range(emd_tita_net.shape[0]):
-            print(i,emd_tita_net[i].shape,subsegments[i])
-            
-        index_vector = torch.arange(emd_tita_net.shape[0])
+            temp_segments,temp_start, temp_end = endsubsegments[i]
+            if (temp_start,temp_end) not in self.seen_times:
+                self.seen_times.add((start, end))
+                unique_subsegments.append((emd_tita_net[i],temp_segments,temp_start, temp_end))
+        
+        self.embedding_arr = np.vstack((self.embedding_arr, unique_subsegments))
+        index_vector = torch.arange(self.embedding_arr.shape[0])
         print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
         
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
@@ -532,7 +538,6 @@ class SpeakerDiarization(base.Pipeline):
         #lol_cluster.add_embeddings(emd_tita_net)
         #predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
         #print(f"Predicted cluster: {predicted_cluster}")
-        self.embedding_arr = np.vstack((self.embedding_arr, emd_tita_net))
         print(f" torch.tensor(self.embedding_arr) {torch.tensor(self.embedding_arr).shape} emd_tita_net {emd_tita_net.shape}")
         tempo = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.tensor(self.embedding_arr).to(torch.float),
