@@ -176,8 +176,8 @@ transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
 source.stream.pipe(
     ops.map(print_output),
-    ops.buffer_with_count(count=1),
-    ops.map(print2),
+    # ops.buffer_with_count(count=1),
+    # ops.map(print2),
     ops.map(dia),
     ops.map(splitter),
     # ops.filter(lambda ann_wav: ann_wav[0].get_timeline().duration() > 0),
