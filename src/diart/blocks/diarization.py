@@ -521,7 +521,7 @@ class SpeakerDiarization(base.Pipeline):
         for i in range(emd_tita_net.shape[0]):
             temp_segments,temp_start, temp_end = subsegments[i]
             if not self.inside_interval([temp_start,temp_end]): # if the segment is alread created don't add
-                print(temp_start,temp_end)
+                print("add intervals:",temp_start,temp_end)
                 unique_subsegments.append((len(self.embedding_arr)+i,emd_tita_net[i],temp_segments,temp_start, temp_end))
         
         # adding the intervals to stop from creating redundent segments
@@ -530,11 +530,10 @@ class SpeakerDiarization(base.Pipeline):
                 self.seen_times.append((i, j))
 
         self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
-        print(f"global number {len(self.embedding_arr)}")
+        print(f"global number of embedding {len(self.embedding_arr)}")
         
         self.global_offset += 0.5 # step size
         tempoooo = np.array([[x[3],x[4]] for x in self.embedding_arr])
-        print(tempoooo)
         print(f" torch.tensor(self.embedding_arr) {torch.tensor(len(self.embedding_arr))} emd_tita_net {emd_tita_net.shape}")
         tempo = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.stack([x[1] for x in self.embedding_arr]).to(torch.float),
