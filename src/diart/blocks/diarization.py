@@ -527,7 +527,7 @@ class SpeakerDiarization(base.Pipeline):
         for i in range(emd_tita_net.shape[0]):
             temp_segments,temp_start, temp_end = subsegments[i]
             if (temp_start,temp_end) not in self.seen_times:
-                self.seen_times.add((start, end))
+                self.seen_times.add((temp_start, temp_end))
                 unique_subsegments.append((emd_tita_net[i],temp_segments,temp_start, temp_end))
         
         self.embedding_arr = np.vstack((self.embedding_arr, unique_subsegments)) # concatonate to global array
