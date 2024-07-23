@@ -178,7 +178,7 @@ def update_accumulated_data(acc, new_data):
     acc = np.concatenate((acc, new_data))
     if len(acc) > required_length:
         acc = acc[-required_length:]  # Keep only the latest `required_length` samples
-    print("acc size",acc)
+    print("acc size",len(acc),acc)
     return acc
 
 # Function to accumulate data until it reaches chunk_size
