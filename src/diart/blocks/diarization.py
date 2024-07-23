@@ -381,7 +381,6 @@ class SpeakerDiarizationConfig(base.PipelineConfig):
         self.device = device or torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
-
     @property
     def duration(self) -> float:
         return self._duration
@@ -436,6 +435,7 @@ class SpeakerDiarization(base.Pipeline):
         self.clustering = None
         self.chunk_buffer, self.pred_buffer = [], []
         self.reset()
+        self.embedding_arr = np.empty((0, 192)) # added
 
     @staticmethod
     def get_config_class() -> type:
@@ -524,7 +524,7 @@ class SpeakerDiarization(base.Pipeline):
         print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
         
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
-        print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
+        #print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
         # clusters = clustering_Agglomerative.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
         # print(f"Legendary clusters pyaanote {clusters}")
         self.global_offset += 0.5 # step size
@@ -532,8 +532,10 @@ class SpeakerDiarization(base.Pipeline):
         #lol_cluster.add_embeddings(emd_tita_net)
         #predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
         #print(f"Predicted cluster: {predicted_cluster}")
+        self.embedding_arr = np.vstack((self.embedding_arr, emd_tita_net))
+
         tempo = speaker_clustering.forward_infer(
-            embeddings_in_scales=emd_tita_net,
+            embeddings_in_scales=self.embedding_arr,
             timestamps_in_scales=torch.tensor([[start,end]for start,end in zip(subseg_start, subseg_ends)]),
             multiscale_segment_counts= torch.tensor([emd_tita_net.shape[0]]),
             multiscale_weights=torch.tensor([1]),
