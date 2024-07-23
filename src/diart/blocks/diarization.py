@@ -490,7 +490,5 @@ class SpeakerDiarization(base.Pipeline):
         )
         
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
-        ############################################################
-        print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentations {segmentations.shape} embeddings {embeddings.shape}")
       
         return clustering_prediction,self.embedding_arr,batch.reshape(-1)
