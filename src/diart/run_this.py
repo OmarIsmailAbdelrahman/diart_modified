@@ -178,11 +178,19 @@ min_update_size = sample_rate * step_size
 required_length = sample_rate * window
 
 def update_accumulated_data(acc, new_data):
-    if len(new_data) < min_update_size:
-        return acc  # Skip updating if new_data size is less than min_update_size
     acc = np.concatenate((acc, new_data))
     if len(acc) > required_length:
         acc = acc[-required_length:]  # Keep only the latest `required_length` samples
+    return acc
+
+# Function to accumulate data until it reaches chunk_size
+def accumulate_chunks(acc, new_data):
+    acc['buffer'] = np.concatenate((acc['buffer'], new_data))
+    if len(acc['buffer']) >= chunk_size:
+        acc['data'] = acc['buffer'][:chunk_size]
+        acc['buffer'] = acc['buffer'][chunk_size:]
+    else:
+        acc['data'] = np.array([])
     return acc
     
 def process_accumulated_data(data):
@@ -191,8 +199,11 @@ def process_accumulated_data(data):
     return data
 
 source.stream.pipe(
-    ops.scan(lambda acc, x: update_accumulated_data(acc, x), seed=np.array([])),  # Accumulate data
-    ops.filter(lambda x: len(x) >= required_length),  # Filter only when data length is >= 320000
+    ops.scan(accumulate_chunks, seed={'buffer': np.array([]), 'data': np.array([])}),  # Accumulate data until chunk_size
+    ops.filter(lambda acc: len(acc['data']) > 0),  # Filter only when a new chunk is ready
+    ops.map(lambda acc: acc['data']),  # Extract the new chunk from the accumulator
+    ops.scan(lambda acc, x: update_accumulated_data(acc, x), seed=np.array([])),  # Update the accumulated data
+    ops.filter(lambda x: len(x) >= required_length),  # Filter only when data length is >= required_length
     ops.map(print_output),
     # ops.map(print2),
     ops.map(dia),
