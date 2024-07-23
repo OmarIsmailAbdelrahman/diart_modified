@@ -133,8 +133,6 @@ def get_subsegments(offset: float, window: float, shift: float, duration: float)
 
 def create_subsegments_from_segments(segments, global_offset, sample_rate=16000, window=0.63, shift=0.08):
     all_subsegments = []
-    all_subsegments_starts = []
-    all_subsegments_end = []
     for segment, seg_start_time, seg_end_time in segments:
         duration = len(segment) / sample_rate
         subsegments = get_subsegments(0, window, shift, duration)
@@ -144,12 +142,10 @@ def create_subsegments_from_segments(segments, global_offset, sample_rate=16000,
             subsegment = segment[start_sample:end_sample]
             subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
             subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
-            all_subsegments.append(subsegment)
-            all_subsegments_starts.append(subsegment_start_time)
-            all_subsegments_end.append(subsegment_end_time)
+            all_subsegments.append((subsegment,subsegment_start_time,subsegment_end_time))
             print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
     
-    return all_subsegments, all_subsegments_starts, all_subsegments_end
+    return all_subsegments
 
 # Embedding Module "Titanet"
 speaker_model = EncDecSpeakerLabelModel.from_pretrained(model_name="titanet_large")
@@ -516,10 +512,14 @@ class SpeakerDiarization(base.Pipeline):
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
-        subsegments,subseg_start, subseg_ends = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
-        print(f"Legendary number of subSegments created from batch {len(subsegments)} segment sizes {[len(segment) for segment in subsegments] } global offset {self.global_offset}")
+        subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
+        print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset}")
         
-        emd_tita_net = torch.tensor(get_embeddings(subsegments))
+        emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
+        
+        for i in range(emd_tita_net):
+            print((emd_tita_net[i].shape,subsegments[i,0].shape,subsegments[i,1],subsegments[i,2]))
+            
         index_vector = torch.arange(emd_tita_net.shape[0])
         print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
         
