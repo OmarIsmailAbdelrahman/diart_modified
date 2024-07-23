@@ -110,7 +110,7 @@ import numpy as np
 from pyannote.core import Annotation, SlidingWindowFeature, SlidingWindow
 
 def splitter(x):
-    print("splitter",len(x))
+    print("splitter",np.array(np.array(x)))
     return x
 
 def colorize_transcription(transcription):
@@ -133,11 +133,8 @@ def colorize_transcription(transcription):
     return "\n".join(result)
 
 def print_output(x):
-    print(len(x))
+    print()
     return x
-def print2(x):
-    print(f"Legendary-print2 output buffer_with_count {np.array(x).shape}")
-    return "lol"
 
 ########################################
 
