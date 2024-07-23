@@ -154,7 +154,9 @@ def get_embeddings(subsegments):
     for segment in subsegments:        
         embedding = speaker_model.get_embedding(segment).detach().cpu().numpy()
         embeddings.append(embedding)
-    return np.vstack(embeddings)
+    if len(embeddings) > 1 :
+        return np.vstack(embeddings)
+    return np.array(embeddings)
 
 # Clustering Module
 from nemo.collections.asr.parts.utils.online_clustering import NemoOnlineSpeakerClustering
