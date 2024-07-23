@@ -533,7 +533,7 @@ class SpeakerDiarization(base.Pipeline):
         #predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
         #print(f"Predicted cluster: {predicted_cluster}")
         self.embedding_arr = np.vstack((self.embedding_arr, emd_tita_net))
-
+        print(f" torch.tensor(self.embedding_arr) {torch.tensor(self.embedding_arr).shape}")
         tempo = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.tensor(self.embedding_arr),
             timestamps_in_scales=torch.tensor([[start,end]for start,end in zip(subseg_start, subseg_ends)]),
