@@ -508,7 +508,7 @@ class SpeakerDiarization(base.Pipeline):
 
         # subsegment them on window 0.63 with shift 0.08
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=1, shift=0.25)
+        subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.5, shift=0.125)
         print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset}")
 
