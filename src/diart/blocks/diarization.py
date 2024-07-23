@@ -181,6 +181,9 @@ clustering_model = NemoOnlineSpeakerClustering(
 
 
 # clustering_model.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
+from nemo.collections.asr.parts.utils.longform_clustering import LongFormSpeakerClustering
+speaker_clustering = LongFormSpeakerClustering(cuda=cuda)
+
 ########################################################################################
 # Clustring 
 
@@ -529,6 +532,19 @@ class SpeakerDiarization(base.Pipeline):
         lol_cluster.add_embeddings(emd_tita_net)
         predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
         print(f"Predicted cluster: {predicted_cluster}")
+        tempo = speaker_clustering.forward_infer(
+            embeddings_in_scales=emd_tita_net,
+            timestamps_in_scales=[[start,end]for start,end in zip(subseg_start, subseg_ends)],
+            multiscale_segment_counts= torch.tensor([emd_tita_net.shape[0]]),
+            multiscale_weights=torch.tensor([1]),
+            oracle_num_speakers=-1,
+            max_num_speakers=8,
+            max_rp_threshold=0.1,
+            sparse_search_volume=50,
+            chunk_cluster_count=50,
+            embeddings_per_chunk=10000,
+        )
+        print(f"if it reached here, lol man, just lol {tempo}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
