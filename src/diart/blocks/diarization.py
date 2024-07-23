@@ -534,7 +534,7 @@ class SpeakerDiarization(base.Pipeline):
         print(f"Predicted cluster: {predicted_cluster}")
         tempo = speaker_clustering.forward_infer(
             embeddings_in_scales=emd_tita_net,
-            timestamps_in_scales=[[start,end]for start,end in zip(subseg_start, subseg_ends)],
+            timestamps_in_scales=torch.tensor([[start,end]for start,end in zip(subseg_start, subseg_ends)]),
             multiscale_segment_counts= torch.tensor([emd_tita_net.shape[0]]),
             multiscale_weights=torch.tensor([1]),
             oracle_num_speakers=-1,
