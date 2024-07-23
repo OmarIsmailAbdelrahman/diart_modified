@@ -507,7 +507,8 @@ class SpeakerDiarization(base.Pipeline):
         ############################################################
         # Detect segments that contain activatiy
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
-
+        print(f"VAD number of intervals {len(start_timestamps)} of batch size {batch.reshape(-1).shape}")
+        
         # subsegment them on window 0.63 with shift 0.08
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.5, shift=0.125)
