@@ -534,7 +534,7 @@ class SpeakerDiarization(base.Pipeline):
         
         self.global_offset += 0.5 # step size
         tempoooo = np.array([[x[3],x[4]] for x in self.embedding_arr])
-        print(f" torch.tensor(self.embedding_arr) {torch.tensor(len(self.embedding_arr))} emd_tita_net {emd_tita_net.shape}")
+        print(f" emd_tita_net shape {emd_tita_net.shape}")
         tempo = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.stack([x[1] for x in self.embedding_arr]).to(torch.float),
             timestamps_in_scales=torch.tensor(tempoooo),
