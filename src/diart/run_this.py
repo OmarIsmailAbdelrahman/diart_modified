@@ -180,7 +180,7 @@ def update_accumulated_data(acc, new_data):
     sample_rate = 16000
     window = 5
     acc = np.concatenate((acc, new_data))
-    if len(acc) > sample_rate * windows:
+    if len(acc) > sample_rate * window:
         acc = acc[-required_length:]  # Keep only the latest `required_length` samples
     return acc
     
