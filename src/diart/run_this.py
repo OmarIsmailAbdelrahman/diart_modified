@@ -169,12 +169,9 @@ source = WavFileSimulatedMicrophoneAudioSource(wav_file,0.1)
 
 asr = Wav2Vec2Transcriber()
 
-transcription_duration = 2
-batch_size = int(transcription_duration // config.step)
 sample_rate = 16000
 window = 5
-step_size = step
-chunk_size = int(sample_rate * step_size)  
+chunk_size = int(sample_rate * step)  
 required_length = sample_rate * window
 
 def update_accumulated_data(acc, new_data):
@@ -189,6 +186,7 @@ def accumulate_chunks(acc, new_data):
     if len(acc['buffer']) >= chunk_size:
         acc['data'] = acc['buffer'][:chunk_size]
         acc['buffer'] = acc['buffer'][chunk_size:]
+        print("buffer size", len(acc["buffer"]) , "data size" , len(acc["data"])) 
     else:
         acc['data'] = np.array([])
     return acc
