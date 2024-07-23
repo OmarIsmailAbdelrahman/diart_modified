@@ -424,22 +424,8 @@ class SpeakerDiarization(base.Pipeline):
         Sequence[tuple[Annotation, SlidingWindowFeature]]
             Speaker diarization of each chunk alongside their corresponding audio.
         """
-        #for wave in waveforms:
-        #    print(f"legendary-SpeakerDiarization-__call__ wave size {wave.data.squeeze().shape} for vad shape {wave.data.squeeze().reshape(-1).shape}") 
         batch_size = len(waveforms)
-        msg = "Pipeline expected at least 1 input"
-        assert batch_size >= 1, msg 
-        # Create batch from chunk sequence, shape (batch, samples, channels)
         batch = torch.tensor(waveforms)
-
-        expected_num_samples = int(
-            np.rint(self.config.duration * self.config.sample_rate)
-        )
-        msg = f"Expected {expected_num_samples} samples per chunk, but got {batch.shape[1]}"
-        assert batch.shape[1] == expected_num_samples, msg
-
-
-
       
         ############################################################
         # Detect segments that contain activatiy
