@@ -556,6 +556,7 @@ class SpeakerDiarization(base.Pipeline):
         )
         
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
+        return clustering_prediction
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
