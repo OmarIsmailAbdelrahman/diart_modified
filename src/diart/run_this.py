@@ -195,6 +195,7 @@ def accumulate_chunks(acc, new_data):
 def process_accumulated_data(data):
     # Process the accumulated data (e.g., print its length)
     print(f"Processing data of length: {len(data)}")
+    print("global from outside lol",source.global_offset)
     return data
 
 source.stream.pipe(
