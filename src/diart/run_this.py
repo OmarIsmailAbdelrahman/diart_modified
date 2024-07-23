@@ -240,7 +240,7 @@ logging.getLogger("whisper_timestamped").setLevel(logging.ERROR)
 #segmentation = SegmentationModel(segmentation_loader)
 
 config = SpeakerDiarizationConfig (
-    duration=2,
+    duration=5, # tried to set it to small duration but VAD model couldn't detect activity correctly
     step=1,
     latency="min",
     tau_active=0.5,
