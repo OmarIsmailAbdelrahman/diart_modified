@@ -315,7 +315,6 @@ class SpeakerDiarizationConfig(base.PipelineConfig):
 class SpeakerDiarization(base.Pipeline):
     def __init__(self, config: SpeakerDiarizationConfig | None = None):
         self._config = SpeakerDiarizationConfig() if config is None else config
-        self.global_offset = 0
         msg = f"Latency should be in the range [{self._config.step}, {self._config.duration}]"
         assert self._config.step <= self._config.latency <= self._config.duration, msg
         print(f"Legendary-SpeakerDiarization- segmentation config {self._config.segmentation} ")
@@ -351,6 +350,8 @@ class SpeakerDiarization(base.Pipeline):
         self.reset()
         self.embedding_arr = [] # added
         self.seen_times = []  # added
+        self.global_offset = 0 # added
+        self.clustering_results = []
 
     @staticmethod
     def get_config_class() -> type:
@@ -477,6 +478,6 @@ class SpeakerDiarization(base.Pipeline):
         )
         
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
-      
+        self.clustering_results = clustering_prediction
         # return clustering_prediction,self.embedding_arr,batch.reshape(-1)
         return waveforms
