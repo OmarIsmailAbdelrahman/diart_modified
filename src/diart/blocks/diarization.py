@@ -438,6 +438,9 @@ class SpeakerDiarization(base.Pipeline):
         msg = f"Expected {expected_num_samples} samples per chunk, but got {batch.shape[1]}"
         assert batch.shape[1] == expected_num_samples, msg
 
+
+
+      
         ############################################################
         # Detect segments that contain activatiy
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
@@ -488,14 +491,6 @@ class SpeakerDiarization(base.Pipeline):
         
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
         ############################################################
-        
-        #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
-        segmentations = self.segmentation(batch)
-        # embeddings has shape (batch, speakers, emb_dim)
-        embeddings = self.embedding(batch, segmentations)
-        seg_resolution = waveforms[0].extent.duration / segmentations.shape[1]
-        # s = segmentations.numpy()
-        #print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation unique values {np.unique(s)} segmentation {s.shape} reduce to (batch,time) {np.max(s, axis=2).shape} {np.max(s, axis=2)} number of 1: {np.sum(np.max(s, axis=2),axis=1)} embedding {s.shape}")
         print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentations {segmentations.shape} embeddings {embeddings.shape}")
       
         return clustering_prediction,self.embedding_arr,batch.reshape(-1)
