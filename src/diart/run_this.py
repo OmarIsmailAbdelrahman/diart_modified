@@ -185,9 +185,9 @@ source.stream.pipe(
     ops.map(print2),
     ops.map(dia),
     ops.map(splitter),
-    ops.filter(lambda ann_wav: ann_wav[0].get_timeline().duration() > 0),
-    ops.starmap(asr),
-    ops.map(colorize_transcription),
+    # ops.filter(lambda ann_wav: ann_wav[0].get_timeline().duration() > 0),
+    # ops.starmap(asr),
+    # ops.map(colorize_transcription),
 ).subscribe(on_next=rich.print, on_error=lambda _: traceback.print_exc())
 
 print("Listening...")
