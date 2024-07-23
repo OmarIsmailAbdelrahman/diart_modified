@@ -440,6 +440,7 @@ class SpeakerDiarization(base.Pipeline):
 
         # Calculate the Embedding
         emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
+        emd_tita_net = emd_tita_net.reshape(-1,192)
         print(f"Legendary emd_tita_net {emd_tita_net.shape}")
 
         # creating tuple containing embedding subsegment start end time
