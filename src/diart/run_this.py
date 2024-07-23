@@ -240,7 +240,7 @@ logging.getLogger("whisper_timestamped").setLevel(logging.ERROR)
 #segmentation = SegmentationModel(segmentation_loader)
 
 config = SpeakerDiarizationConfig (
-    duration=5,
+    duration=2,
     step=0.5,
     latency="min",
     tau_active=0.5,
