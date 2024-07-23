@@ -19,7 +19,6 @@ from .. import models as m
 
 ########################################################################################
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-global_offset = 0
 # import yaml
 # import torch
 # from pyannote.audio import Inference
@@ -445,7 +444,7 @@ class SpeakerDiarization(base.Pipeline):
                 return True
         return False
         
-    def create_subsegments_from_segments(self,segments, global_offset, sample_rate=16000, window=0.63, shift=0.08):
+    def create_subsegments_from_segments(self,segments, sample_rate=16000, window=0.63, shift=0.08):
         all_subsegments = []
         for segment, seg_start_time, seg_end_time in segments:
             duration = len(segment) / sample_rate
@@ -456,8 +455,8 @@ class SpeakerDiarization(base.Pipeline):
                 if self.inside_interval([start_sample, end_sample]):
                    continue 
                 subsegment = segment[start_sample:end_sample]
-                subsegment_start_time = seg_start_time + (start_sample / sample_rate) + global_offset
-                subsegment_end_time = seg_start_time + (end_sample / sample_rate) + global_offset
+                subsegment_start_time = seg_start_time + (start_sample / sample_rate) + self.global_offset
+                subsegment_end_time = seg_start_time + (end_sample / sample_rate) + self.global_offset
                 all_subsegments.append((subsegment,subsegment_start_time,subsegment_end_time))
                 print(f"Subsegment start: {subsegment_start_time}, end: {subsegment_end_time}")
         
@@ -514,7 +513,7 @@ class SpeakerDiarization(base.Pipeline):
         
         # subsegment them on window 0.63 with shift 0.08
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        subsegments = self.create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.5, shift=0.125)
+        subsegments = self.create_subsegments_from_segments(segments, sample_rate=16000, window=0.5, shift=0.125)
         print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset}")
 
@@ -531,7 +530,7 @@ class SpeakerDiarization(base.Pipeline):
                 unique_subsegments.append((len(self.embedding_arr)+i,emd_tita_net[i],temp_segments,temp_start, temp_end))
         
         # adding the intervals to stop from creating redundent segments
-        for i, j in zip(start_timestamps, end_timestamps):
+        for i, j in zip(start_timestamps+self.global_offset, end_timestamps+self.global_offset):
             if not self.inside_interval([i, j]):
                 print("added intervals",[i, j])
                 self.seen_times.append([i, j])
@@ -539,7 +538,7 @@ class SpeakerDiarization(base.Pipeline):
         self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
         print(f"global number of embedding {len(self.embedding_arr)}")
         
-        self.global_offset += 0.5 # step size
+        self.global_offset += 1 # step size
         tempoooo = np.array([[x[3],x[4]] for x in self.embedding_arr])
         print(f" emd_tita_net shape {emd_tita_net.shape}")
         clustering_prediction = speaker_clustering.forward_infer(
