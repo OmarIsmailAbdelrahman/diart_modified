@@ -509,23 +509,28 @@ class SpeakerDiarization(base.Pipeline):
         # pred = probs[:, 0]
         # print(f"legendary-SpeakerDiarization-__call__ VAD vad_output probs {probs} shape {probs.shape} pred {pred} shape {pred.shape} ")
         # vad_timestamp_results = convert_vad_into_timestamp(signal,pred)
-        
+
+        # Detect segments that contain activatiy
         start_timestamps,end_timestamps = get_vad_timestamps(batch.reshape(-1))
+
+        # subsegment them on window 0.63 with shift 0.08
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         subsegments = create_subsegments_from_segments(segments, self.global_offset, sample_rate=16000, window=0.63, shift=0.08)
+        print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset}")
-        
+
+        # Calculate the Embedding
         emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
-        
+
+        # creating tuple containing embedding subsegment start end time
         unique_subsegments = []
         for i in range(emd_tita_net.shape[0]):
-            temp_segments,temp_start, temp_end = endsubsegments[i]
+            temp_segments,temp_start, temp_end = subsegments[i]
             if (temp_start,temp_end) not in self.seen_times:
                 self.seen_times.add((start, end))
                 unique_subsegments.append((emd_tita_net[i],temp_segments,temp_start, temp_end))
         
-        self.embedding_arr = np.vstack((self.embedding_arr, unique_subsegments))
+        self.embedding_arr = np.vstack((self.embedding_arr, unique_subsegments)) # concatonate to global array
         index_vector = torch.arange(self.embedding_arr.shape[0])
         print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
         
