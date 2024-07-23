@@ -541,7 +541,7 @@ class SpeakerDiarization(base.Pipeline):
         self.global_offset += 0.5 # step size
         tempoooo = np.array([[x[3],x[4]] for x in self.embedding_arr])
         print(f" emd_tita_net shape {emd_tita_net.shape}")
-        tempo = speaker_clustering.forward_infer(
+        clustering_prediction = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.stack([x[1] for x in self.embedding_arr]).to(torch.float),
             timestamps_in_scales=torch.tensor(tempoooo),
             multiscale_segment_counts= torch.tensor([len(self.embedding_arr)]),
@@ -554,7 +554,7 @@ class SpeakerDiarization(base.Pipeline):
             embeddings_per_chunk=10000,
         )
         
-        print(f"if it reached here, lol man, just lol {tempo} shape {len(tempo)}")
+        print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
@@ -610,5 +610,5 @@ class SpeakerDiarization(base.Pipeline):
             if len(self.chunk_buffer) == self.pred_aggregation.num_overlapping_windows:
                 self.chunk_buffer = self.chunk_buffer[1:]
                 self.pred_buffer = self.pred_buffer[1:]
-
+        print("Legendary-__call__-outputs",outputs)
         return outputs
