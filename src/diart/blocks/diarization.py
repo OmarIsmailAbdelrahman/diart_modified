@@ -430,7 +430,7 @@ class SpeakerDiarization(base.Pipeline):
         msg = "Pipeline expected at least 1 input"
         assert batch_size >= 1, msg 
         # Create batch from chunk sequence, shape (batch, samples, channels)
-        batch = torch.stack([torch.from_numpy(w.data) for w in waveforms])
+        batch = torch.tensor(waveforms)
 
         expected_num_samples = int(
             np.rint(self.config.duration * self.config.sample_rate)
