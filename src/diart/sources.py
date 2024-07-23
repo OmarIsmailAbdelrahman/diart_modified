@@ -394,7 +394,7 @@ class WavFileSimulatedMicrophoneAudioSource(AudioSource):
                 data = self.file.read(self.block_size, dtype='int16')
                 if len(data) == 0:
                     break
-                self.stream.on_next(data)
+                self.stream.on_next(data) # this pushs the data into the stream
                 time.sleep(self.block_duration)  # Add delay here
         except Exception as e:
             self.stream.on_error(e)
