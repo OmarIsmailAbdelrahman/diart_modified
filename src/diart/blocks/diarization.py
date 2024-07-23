@@ -529,9 +529,9 @@ class SpeakerDiarization(base.Pipeline):
         # print(f"Legendary clusters pyaanote {clusters}")
         self.global_offset += 0.5 # step size
         
-        lol_cluster.add_embeddings(emd_tita_net)
-        predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
-        print(f"Predicted cluster: {predicted_cluster}")
+        #lol_cluster.add_embeddings(emd_tita_net)
+        #predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
+        #print(f"Predicted cluster: {predicted_cluster}")
         tempo = speaker_clustering.forward_infer(
             embeddings_in_scales=emd_tita_net,
             timestamps_in_scales=torch.tensor([[start,end]for start,end in zip(subseg_start, subseg_ends)]),
