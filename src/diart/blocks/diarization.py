@@ -518,7 +518,7 @@ class SpeakerDiarization(base.Pipeline):
         emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
         
         for i in range(emd_tita_net.shape[0]):
-            print((emd_tita_net[i].shape,subsegments[i,0].shape,subsegments[i,1],subsegments[i,2]))
+            print(i,emd_tita_net[i].shape,subsegments[i])
             
         index_vector = torch.arange(emd_tita_net.shape[0])
         print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
