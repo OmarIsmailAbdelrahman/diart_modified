@@ -133,9 +133,7 @@ def colorize_transcription(transcription):
     return "\n".join(result)
 
 def print_output(x):
-    print(f"Legendary-print_output output of rearrange_audio_stream is SlidingWindowFeature of data: {x.data.shape}")
-    print(f" labels {x.labels}")
-    print(f" sliding start {x.sliding_window.start} ending {x.sliding_window.end}")
+    print(x)
     return x
 def print2(x):
     print(f"Legendary-print2 output buffer_with_count {np.array(x).shape}")
@@ -177,9 +175,6 @@ asr = Wav2Vec2Transcriber()
 transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
 source.stream.pipe(
-    dops.rearrange_audio_stream(
-        config.duration, config.step, config.sample_rate
-    ),
     ops.map(print_output),
     ops.buffer_with_count(count=1),
     ops.map(print2),
