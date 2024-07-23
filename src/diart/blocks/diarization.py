@@ -450,7 +450,7 @@ class SpeakerDiarization(base.Pipeline):
     def config(self) -> SpeakerDiarizationConfig:
         return self._config
         
-    def inside_interval(new_interval):
+    def inside_interval(self,new_interval):
         start,end = new_interval
         for interval in self.seen_times:
             interval_start,interval_ends = interval
