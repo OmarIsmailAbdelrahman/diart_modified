@@ -301,7 +301,7 @@ class LoLClusteringAlgorithm:
         
         # Update the cluster centroid
         self.cluster_centroids[cluster_idx] = np.mean(np.vstack(cluster), axis=0)
-        print(f"self.cluster_centroids {np.array(self.cluster_centroids).shape}")
+        # print(f"self.cluster_centroids {np.array(self.cluster_centroids).shape}")
         
     def predict_cluster(self, new_embedding):
         # Ensure new_embedding is a numpy array
@@ -524,7 +524,7 @@ class SpeakerDiarization(base.Pipeline):
         print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
         # clusters = clustering_Agglomerative.cluster(embeddings=emd_tita_net, min_clusters=2, max_clusters=3, num_clusters=len(emd_tita_net))
         # print(f"Legendary clusters pyaanote {clusters}")
-        self.global_offset += len(batch.reshape(-1)) / 16000 / batch_size
+        self.global_offset += 0.5 # step size
         
         lol_cluster.add_embeddings(emd_tita_net)
         predicted_cluster = lol_cluster.predict_cluster(emd_tita_net)
