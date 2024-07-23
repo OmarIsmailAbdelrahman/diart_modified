@@ -19,65 +19,6 @@ from .. import models as m
 
 ########################################################################################
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# import yaml
-# import torch
-# from pyannote.audio import Inference
-
-# from nemo.collections.asr.parts.utils.vad_utils import (
-#     generate_overlap_vad_seq,
-#     generate_vad_frame_pred,
-#     generate_vad_segment_table,
-#     init_vad_model,
-#     prepare_manifest,
-# )
-# config_path = "/kaggle/working/change_vad_config.yaml"
-# with open(config_path, 'r') as file:
-#     cfg = yaml.safe_load(file)
-
-# vad_model = init_vad_model("vad_multilingual_marblenet")
-# vad_model.eval()
-# vad_model.to(device)
-
-# import librosa
-
-# def prepare_input_from_array(audio):
-#     # Extract 64 MFCC features
-#     temp = audio.to('cpu').numpy()
-#     print(f"audio {audio.shape}")
-#     mfcc = librosa.feature.melspectrogram(y=temp, sr=16000, n_mels=2400, n_fft=400, hop_length=160)
-#     print(f"mfcc {mfcc.shape}")
-#     return torch.from_numpy(mfcc).to('cuda')
-
-# def convert_vad_into_timestamp(audio,model_output):
-#     audio_data = audio.cpu().numpy()
-#     model_output_np = model_output.detach().cpu().numpy()
-#     sr = 16000
-#     samples_per_frame = len(audio_data) // model_output_np.shape[0]
-
-#     # Initialize an array to hold the probabilities for each timestamp
-#     prob_sums = np.zeros(len(audio_data))
-#     counts = np.zeros(len(audio_data))
-
-#     # Assign probabilities to each frame
-#     for i in range(model_output_np.shape[0]):
-#         start_idx = i * samples_per_frame
-#         end_idx = start_idx + samples_per_frame
-#         prob_speech = model_output_np[i]  # Probability of speech for this frame
-#         prob_sums[start_idx:end_idx] += prob_speech
-#         counts[start_idx:end_idx] += 1
-    
-#     # Ensure the last part of the signal is covered
-#     if end_idx < len(audio_data):
-#         prob_sums[end_idx:] += model_output_np[-1]
-#         counts[end_idx:] += 1
-    
-#     # Calculate the mean probability for each timestamp
-#     probabilities = prob_sums / counts
-    
-#     # The probabilities array now holds the speech probabilities for each timestamp in the original signal
-#     print(f"Legendary-convert_vad_into_timestamp probabilities {probabilities} probabilities.shape {probabilities.shape} samples_per_frame {samples_per_frame} audio shape {audio.shape}")
-#     np.save('probabilities.npy', probabilities)
-#     return probabilities
 from nemo.collections.asr.models import EncDecSpeakerLabelModel
 # VAD model
 from pyannote.audio import Model
@@ -151,15 +92,6 @@ clustering_model = NemoOnlineSpeakerClustering(
             current_buffer_size=100,
             cuda=device,
         )
-
-# from pyannote.audio.pipelines.clustering import AgglomerativeClustering
-# clustering_Agglomerative = AgglomerativeClustering().instantiate(
-#     {
-#         "method": "centroid",
-#         "min_cluster_size": 12,
-#         "threshold": 0.7045654963945799,
-#     }
-# )
 
 
 # clustering_model.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
@@ -556,7 +488,6 @@ class SpeakerDiarization(base.Pipeline):
         )
         
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
-        return clustering_prediction
         ############################################################
         
         #segmentations = torch.max(self.segmentation(batch),axis=2)  # shape (batch, frames, speakers)
@@ -583,7 +514,7 @@ class SpeakerDiarization(base.Pipeline):
 
             # Update clustering state and permute segmentation
             permuted_seg = self.clustering(seg, emb)
-            print(f"legendary-SpeakerDiarization-__call__ permuted_seg {permuted_seg}")
+            print(f"legendary-SpeakerDiarization-__call__ permuted_seg {permuted_seg} wav shape {wav.shape}")
             # Update sliding buffer
             self.chunk_buffer.append(wav)
             self.pred_buffer.append(permuted_seg)
@@ -613,4 +544,4 @@ class SpeakerDiarization(base.Pipeline):
                 self.chunk_buffer = self.chunk_buffer[1:]
                 self.pred_buffer = self.pred_buffer[1:]
         print("Legendary-__call__-outputs",outputs)
-        return outputs
+        return clustering_prediction
