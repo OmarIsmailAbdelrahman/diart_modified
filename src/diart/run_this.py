@@ -150,10 +150,10 @@ logging.getLogger("whisper_timestamped").setLevel(logging.ERROR)
 #    return nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
 #embedding = EmbeddingModel(embedding_loader)
 #segmentation = SegmentationModel(segmentation_loader)
-
+step = 0.5
 config = SpeakerDiarizationConfig (
     duration=5, # tried to set it to small duration but VAD model couldn't detect activity correctly
-    step=1,
+    step=step,
     latency="min",
     tau_active=0.5,
     rho_update=0.1,
@@ -173,7 +173,7 @@ transcription_duration = 2
 batch_size = int(transcription_duration // config.step)
 sample_rate = 16000
 window = 5
-step_size = 0.5
+step_size = step
 chunk_size = int(sample_rate * step_size)  
 required_length = sample_rate * window
 
