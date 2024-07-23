@@ -385,7 +385,8 @@ class SpeakerDiarization(base.Pipeline):
             
             for start_sample, end_sample in subsegment_samples:
                 if self.inside_interval([start_sample, end_sample]):
-                   continue 
+                    print("continue")
+                    continue 
                 subsegment = segment[start_sample:end_sample]
                 subsegment_start_time = seg_start_time + (start_sample / sample_rate) + self.global_offset
                 subsegment_end_time = seg_start_time + (end_sample / sample_rate) + self.global_offset
@@ -435,7 +436,7 @@ class SpeakerDiarization(base.Pipeline):
         # subsegment them on window 0.63 with shift 0.08
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
         subsegments = self.create_subsegments_from_segments(segments, sample_rate=16000, window=0.5, shift=0.125)
-        print(f"Legendary number of segments created from batch {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
+        print(f"Legendary number of segments {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset} increase by step {self._config.step}")
 
         # Calculate the Embedding
