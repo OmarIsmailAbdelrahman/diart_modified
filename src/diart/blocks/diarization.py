@@ -472,7 +472,6 @@ class SpeakerDiarization(base.Pipeline):
         print(f"global number of embedding {len(self.embedding_arr)}")
         
         self.global_offset += 1 # step size
-        tempoooo = np.array([[x[3],x[4]] for x in self.embedding_arr])
         print(f" emd_tita_net shape {emd_tita_net.shape}")
         clustering_prediction = speaker_clustering.forward_infer(
             embeddings_in_scales=torch.stack([x[1] for x in self.embedding_arr]).to(torch.float),
@@ -498,6 +497,8 @@ class SpeakerDiarization(base.Pipeline):
         # s = segmentations.numpy()
         #print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentation unique values {np.unique(s)} segmentation {s.shape} reduce to (batch,time) {np.max(s, axis=2).shape} {np.max(s, axis=2)} number of 1: {np.sum(np.max(s, axis=2),axis=1)} embedding {s.shape}")
         print(f"legendary-SpeakerDiarization-__call__ batch {batch.shape} segmentations {segmentations.shape} embeddings {embeddings.shape}")
+      
+        return clustering_prediction,self.embedding_arr,batch.reshape(-1)
 
         outputs = []
         for wav, seg, emb in zip(waveforms, segmentations, embeddings):
@@ -544,4 +545,3 @@ class SpeakerDiarization(base.Pipeline):
                 self.chunk_buffer = self.chunk_buffer[1:]
                 self.pred_buffer = self.pred_buffer[1:]
         print("Legendary-__call__-outputs",outputs)
-        return clustering_prediction
