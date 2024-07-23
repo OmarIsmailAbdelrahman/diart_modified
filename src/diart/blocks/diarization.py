@@ -182,7 +182,7 @@ clustering_model = NemoOnlineSpeakerClustering(
 
 # clustering_model.forward_infer(curr_emb=curr_emb, base_segment_indexes=base_segment_indexes, frame_index=frame_index, cuda=cuda)
 from nemo.collections.asr.parts.utils.longform_clustering import LongFormSpeakerClustering
-speaker_clustering = LongFormSpeakerClustering(cuda=cuda)
+speaker_clustering = LongFormSpeakerClustering(cuda=device)
 
 ########################################################################################
 # Clustring 
