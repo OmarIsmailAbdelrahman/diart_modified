@@ -530,7 +530,8 @@ class SpeakerDiarization(base.Pipeline):
                 unique_subsegments.append((len(self.embedding_arr)+i,emd_tita_net[i],temp_segments,temp_start, temp_end))
         
         # adding the intervals to stop from creating redundent segments
-        for i, j in zip(start_timestamps+self.global_offset, end_timestamps+self.global_offset):
+        for i, j in zip([x+self.global_offset for x in start_timestamps], [x+self.global_offset for x in end_timestamps]): # this is adding the offset 
+            print(i,j)
             if not self.inside_interval([i, j]):
                 print("added intervals",[i, j])
                 self.seen_times.append([i, j])
