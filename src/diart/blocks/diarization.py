@@ -431,7 +431,7 @@ class SpeakerDiarization(base.Pipeline):
         self.clustering = None
         self.chunk_buffer, self.pred_buffer = [], []
         self.reset()
-        self.embedding_arr = np.empty((0, 192)) # added
+        self.embedding_arr = [] # added
         self.seen_times = set()  # added
 
     @staticmethod
@@ -521,18 +521,19 @@ class SpeakerDiarization(base.Pipeline):
 
         # Calculate the Embedding
         emd_tita_net = torch.tensor(get_embeddings([subsegment[0] for subsegment in subsegments]))
+        print(f"Legendary emd_tita_net {emd_tita_net.shape}")
 
         # creating tuple containing embedding subsegment start end time
         unique_subsegments = []
         for i in range(emd_tita_net.shape[0]):
             temp_segments,temp_start, temp_end = subsegments[i]
             if (temp_start,temp_end) not in self.seen_times:
+                unique_subsegments.append((len(self.seen_times),emd_tita_net[i],temp_segments,temp_start, temp_end))
                 self.seen_times.add((temp_start, temp_end))
-                unique_subsegments.append((emd_tita_net[i],temp_segments,temp_start, temp_end))
         
-        self.embedding_arr = np.vstack((self.embedding_arr, unique_subsegments)) # concatonate to global array
-        index_vector = torch.arange(self.embedding_arr.shape[0])
-        print(f"Legendary emd_tita_net {emd_tita_net.shape} index vector {index_vector.shape}")
+        self.embedding_arr = self.embedding_arr + unique_subsegments # concatonate to global array
+        print(f"global number {len(self.embedding_arr)}")
+        # index_vector = torch.arange(self.embedding_arr.shape[0])
         
         # clustering_model.forward_infer(curr_emb=emd_tita_net, cuda=cuda)
         #print(f"lol if this wroked first time {clustering_model.forward_infer(curr_emb=emd_tita_net,base_segment_indexes = index_vector)}")
@@ -545,9 +546,9 @@ class SpeakerDiarization(base.Pipeline):
         #print(f"Predicted cluster: {predicted_cluster}")
         print(f" torch.tensor(self.embedding_arr) {torch.tensor(self.embedding_arr).shape} emd_tita_net {emd_tita_net.shape}")
         tempo = speaker_clustering.forward_infer(
-            embeddings_in_scales=torch.tensor(self.embedding_arr).to(torch.float),
-            timestamps_in_scales=torch.tensor([[start,end]for start,end in zip(subseg_start, subseg_ends)]),
-            multiscale_segment_counts= torch.tensor([emd_tita_net.shape[0]]),
+            embeddings_in_scales=torch.tensor([x[1] for x in self.embedding_arr]).to(torch.float),
+            timestamps_in_scales=torch.tensor([[x[3],x[4]] for x in self.embedding_arr]),
+            multiscale_segment_counts= torch.tensor([len(self.embedding_arr)]),
             multiscale_weights=torch.tensor([1]),
             oracle_num_speakers=-1,
             max_num_speakers=8,
