@@ -306,12 +306,7 @@ class EmbeddingGraph:
             self.add_embedding(embedding_id)
             if label not in label_to_embeddings:
                 label_to_embeddings[label] = []
-            label_to_embeddings[label].append(embedding_id)
-        # Update edges within each label group
-        for embedding_ids in label_to_embeddings.values():
-              print(f"embedding_ids {embedding_ids}")
-            self.update_edges_for_label(embedding_ids)
-        
+            label_to_embeddings[label].append(embedding_id)        
         # Update edges within each label group
         for embedding_ids in label_to_embeddings.values():
             print(f"connected embeddings {embedding_ids}")
