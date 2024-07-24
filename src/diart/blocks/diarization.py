@@ -304,6 +304,7 @@ class EmbeddingGraph:
         label_to_embeddings = {}
         for embedding_id, label in zip(embedding_arr, clustering_prediction):
             self.add_embedding(embedding_id)
+            print(f"embedding_id {embedding_id}, label {label}")
             if label not in label_to_embeddings:
                 label_to_embeddings[label] = []
             label_to_embeddings[label].append(embedding_id)        
