@@ -276,6 +276,9 @@ def majority_voting_labeling(clustering_prediction, embedding_arr):
 
 ##########################################################################################
 # Graph for clustering 
+import networkx as nx
+from collections import defaultdict
+
 class EmbeddingGraph:
     def __init__(self):
         self.graph = nx.Graph()
