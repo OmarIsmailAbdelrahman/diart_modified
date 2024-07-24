@@ -567,6 +567,6 @@ class SpeakerDiarization(base.Pipeline):
         print("Legendary filtered_graph {filtered_graph}")
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
         self.clustering_results = clustering_prediction
-        self.intervals_predictions = majority_voting_labeling()
+        # self.intervals_predictions = majority_voting_labeling()
         # return clustering_prediction,self.embedding_arr,batch.reshape(-1)
         return waveforms
