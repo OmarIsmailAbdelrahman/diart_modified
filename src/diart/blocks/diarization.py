@@ -301,8 +301,9 @@ class EmbeddingGraph:
 
     def add_embeddings_with_predictions(self, embedding_arr, clustering_prediction):
         # Group embeddings by their predicted labels
+        clustering_prediction = [int(label) for label in clustering_prediction]
         unique_labels = set(clustering_prediction)
-        label_to_embeddings = {int(label): [] for label in unique_labels}
+        label_to_embeddings = {label: [] for label in unique_labels}
 
         for embedding_id, label in zip(embedding_arr, clustering_prediction):
             self.add_embedding(embedding_id)
