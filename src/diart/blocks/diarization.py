@@ -306,7 +306,7 @@ class EmbeddingGraph:
 
         for embedding_id, label in zip(embedding_arr, clustering_prediction):
             self.add_embedding(embedding_id)
-            label_to_embeddings[label].append(embedding_id)
+            label_to_embeddings[int(label)].append(embedding_id)
             print(f"label_to_embeddings[label] {label_to_embeddings[label]}, label {label}")
 
         # Update edges within each label group
