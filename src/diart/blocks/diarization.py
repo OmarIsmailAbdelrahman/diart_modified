@@ -303,6 +303,7 @@ class EmbeddingGraph:
         # Group embeddings by their predicted labels
         label_to_embeddings = defaultdict(list)
         for embedding_id, label in zip(embedding_arr, clustering_prediction):
+            print(f"emb id {embedding_id} label {label}")
             self.add_embedding(embedding_id)
             label_to_embeddings[label].append(embedding_id)
         
