@@ -243,8 +243,85 @@ lol_cluster = LoLClusteringAlgorithm(max_points_per_cluster=20, recluster_condit
 # predicted_cluster = clustering_algorithm.predict_cluster(new_embedding)
 # print(f"Predicted cluster: {predicted_cluster}")
 
-##########################################################################################
+def majority_voting_labeling(clustering_prediction, embedding_arr):
+  # Extract intervals with their labels
+  intervals = [(label, (entry[3], entry[4])) for label, entry in zip(clustering_prediction, embedding_arr)]
+  
+  # Step 1: Extract all unique time points
+  time_points = set()
+  for label, (start, end) in intervals:
+      time_points.update([start, end])
+  time_points = sorted(time_points)
+  
+  # Step 2: Create a list for time intervals with their corresponding labels
+  time_labels = []
+  for i in range(len(time_points) - 1):
+      current_interval = (time_points[i], time_points[i + 1])
+      current_labels = [label for label, (start, end) in intervals if start < current_interval[1] and end > current_interval[0]]
+      if current_labels:
+          most_common_label = Counter(current_labels).most_common(1)[0][0]
+          time_labels.append((most_common_label, current_interval))
+  
+  # Step 3: Combine consecutive intervals with the same label
+  result_intervals = []
+  if time_labels:
+      current_label, current_start = time_labels[0][0], time_labels[0][1][0]
+      for label, (start, end) in time_labels:
+          if label != current_label:
+              result_intervals.append((current_label, (current_start, start)))
+              current_label, current_start = label, start
+      result_intervals.append((current_label, (current_start, time_labels[-1][1][1])))
+  
+  return result_intervals
 
+##########################################################################################
+# Graph for clustering 
+class EmbeddingGraph:
+    def __init__(self):
+        self.graph = nx.Graph()
+    
+    def add_embedding(self, embedding_id):
+        if not self.graph.has_node(embedding_id):
+            self.graph.add_node(embedding_id)
+
+    def update_edges_for_label(self, embedding_ids):
+        for i in range(len(embedding_ids)):
+            for j in range(i + 1, len(embedding_ids)):
+                self.update_edge(embedding_ids[i], embedding_ids[j])
+
+    def update_edge(self, embedding_id1, embedding_id2):
+        if self.graph.has_edge(embedding_id1, embedding_id2):
+            self.graph[embedding_id1][embedding_id2]['weight'] += 1
+        else:
+            self.graph.add_edge(embedding_id1, embedding_id2, weight=1)
+
+    def add_embeddings_with_predictions(self, embedding_arr, clustering_prediction):
+        # Group embeddings by their predicted labels
+        label_to_embeddings = defaultdict(list)
+        for embedding_id, label in zip(embedding_arr, clustering_prediction):
+            self.add_embedding(embedding_id)
+            label_to_embeddings[label].append(embedding_id)
+        
+        # Update edges within each label group
+        for embedding_ids in label_to_embeddings.values():
+            self.update_edges_for_label(embedding_ids)
+    
+    def filter_graph(self, threshold):
+        filtered_graph = nx.Graph()
+        for u, v, data in self.graph.edges(data=True):
+            if data['weight'] >= threshold:
+                filtered_graph.add_edge(u, v, weight=data['weight'])
+        
+        # Adding isolated nodes (nodes without edges) to the filtered graph
+        for node in self.graph.nodes():
+            if node not in filtered_graph:
+                filtered_graph.add_node(node)
+        
+        return filtered_graph
+
+
+
+###########################################################################################
 class SpeakerDiarizationConfig(base.PipelineConfig):
     def __init__(
         self,
@@ -352,6 +429,7 @@ class SpeakerDiarization(base.Pipeline):
         self.seen_times = []  # added
         self.global_offset = 0 # added
         self.clustering_results = []
+        self.embedding_graph = EmbeddingGraph()
 
     @staticmethod
     def get_config_class() -> type:
@@ -478,11 +556,14 @@ class SpeakerDiarization(base.Pipeline):
             max_num_speakers=8,
             max_rp_threshold=0.1,
             sparse_search_volume=50,
-            chunk_cluster_count=50,
+            chunk_cluster_count=30,
             embeddings_per_chunk=10000,
         )
-        
+        embedding_graph.add_embeddings_with_predictions([x[0] for x in self.embedding_arr], clustering_prediction)
+        filtered_graph = embedding_graph.filter_graph(threshold = 0)
+        print("Legendary filtered_graph {filtered_graph}")
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
         self.clustering_results = clustering_prediction
+        self.intervals_predictions = majority_voting_labeling()
         # return clustering_prediction,self.embedding_arr,batch.reshape(-1)
         return waveforms
