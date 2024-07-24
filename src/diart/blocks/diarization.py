@@ -325,7 +325,12 @@ class EmbeddingGraph:
             if node not in filtered_graph:
                 filtered_graph.add_node(node)
         
-        return filtered_graph
+        # Extract sub-graphs as lists of embedding IDs
+        subgraphs = []
+        for subgraph in nx.connected_components(filtered_graph):
+            subgraphs.append(list(subgraph))
+        
+        return subgraphs
 
 
 
