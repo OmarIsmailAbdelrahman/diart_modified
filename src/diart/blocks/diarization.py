@@ -290,6 +290,7 @@ class EmbeddingGraph:
     def update_edges_for_label(self, embedding_ids):
         for i in range(len(embedding_ids)):
             for j in range(i + 1, len(embedding_ids)):
+                print(f"update edges between {embedding_ids[i]} {embedding_ids[j]}")
                 self.update_edge(embedding_ids[i], embedding_ids[j])
 
     def update_edge(self, embedding_id1, embedding_id2):
@@ -307,6 +308,7 @@ class EmbeddingGraph:
         
         # Update edges within each label group
         for embedding_ids in label_to_embeddings.values():
+            print(f"connected embeddings {embedding_ids}")
             self.update_edges_for_label(embedding_ids)
     
     def filter_graph(self, threshold):
@@ -562,9 +564,11 @@ class SpeakerDiarization(base.Pipeline):
             chunk_cluster_count=30,
             embeddings_per_chunk=10000,
         )
+      # Increment Graph
         self.embedding_graph.add_embeddings_with_predictions([x[0] for x in self.embedding_arr], clustering_prediction)
         filtered_graph = self.embedding_graph.filter_graph(threshold = 0)
         print(f"Legendary filtered_graph {filtered_graph}")
+      
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
         self.clustering_results = clustering_prediction
         # self.intervals_predictions = majority_voting_labeling()
