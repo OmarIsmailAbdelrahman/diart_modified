@@ -434,8 +434,13 @@ class SpeakerDiarization(base.Pipeline):
         print(f"VAD number of intervals {len(start_timestamps)} of batch size {batch.reshape(-1).shape}")
         
         # subsegment them on window 0.63 with shift 0.08
+        subsegments = []
         segments = segment_audio(batch.reshape(-1), start_timestamps, end_timestamps, sample_rate=16000)
-        subsegments = self.create_subsegments_from_segments(segments, sample_rate=16000, window=0.5, shift=0.125)
+        subsegments += self.create_subsegments_from_segments(segments, sample_rate=16000, window=2, shift=1)
+        subsegments += self.create_subsegments_from_segments(segments, sample_rate=16000, window=1, shift=0.5)
+        subsegments += self.create_subsegments_from_segments(segments, sample_rate=16000, window=0.5, shift=0.25)
+        subsegments += self.create_subsegments_from_segments(segments, sample_rate=16000, window=0.25, shift=0.125)
+
         print(f"Legendary number of segments {len(segments)} segment sizes {[len(segment[0]) for segment in segments] } from batch size {batch.reshape(-1).shape}")
         print(f"Legendary number of sub segments created {len(subsegments)} global offset {self.global_offset} increase by step {self._config.step}")
 
