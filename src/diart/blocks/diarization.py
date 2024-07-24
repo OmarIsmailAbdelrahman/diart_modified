@@ -564,7 +564,7 @@ class SpeakerDiarization(base.Pipeline):
         )
         self.embedding_graph.add_embeddings_with_predictions([x[0] for x in self.embedding_arr], clustering_prediction)
         filtered_graph = self.embedding_graph.filter_graph(threshold = 0)
-        print("Legendary filtered_graph {filtered_graph}")
+        print(f"Legendary filtered_graph {filtered_graph}")
         print(f"if it reached here, lol man, just lol {clustering_prediction} shape {len(clustering_prediction)}")
         self.clustering_results = clustering_prediction
         # self.intervals_predictions = majority_voting_labeling()
