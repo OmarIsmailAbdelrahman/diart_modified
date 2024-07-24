@@ -301,11 +301,16 @@ class EmbeddingGraph:
 
     def add_embeddings_with_predictions(self, embedding_arr, clustering_prediction):
         # Group embeddings by their predicted labels
-        label_to_embeddings = defaultdict(list)
+        label_to_embeddings = {}
         for embedding_id, label in zip(embedding_arr, clustering_prediction):
-            print(f"emb id {embedding_id} label {label}")
             self.add_embedding(embedding_id)
+            if label not in label_to_embeddings:
+                label_to_embeddings[label] = []
             label_to_embeddings[label].append(embedding_id)
+        # Update edges within each label group
+        for embedding_ids in label_to_embeddings.values():
+              print(f"embedding_ids {embedding_ids}")
+            self.update_edges_for_label(embedding_ids)
         
         # Update edges within each label group
         for embedding_ids in label_to_embeddings.values():
