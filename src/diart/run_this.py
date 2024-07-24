@@ -111,7 +111,7 @@ from pyannote.core import Annotation, SlidingWindowFeature, SlidingWindow
 
 def splitter(x):
     print("splitter",np.array(np.array(x)))
-    print("global from outside lol",source.global_offset)
+    print("global from outside lol",dia.global_offset)
 
     return x
 
