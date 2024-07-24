@@ -290,7 +290,7 @@ class EmbeddingGraph:
     def update_edges_for_label(self, embedding_ids):
         for i in range(len(embedding_ids)):
             for j in range(i + 1, len(embedding_ids)):
-                print(f"update edges between {embedding_ids[i]} {embedding_ids[j]}")
+                # print(f"update edges between {embedding_ids[i]} {embedding_ids[j]}")
                 self.update_edge(embedding_ids[i], embedding_ids[j])
 
     def update_edge(self, embedding_id1, embedding_id2):
@@ -311,7 +311,7 @@ class EmbeddingGraph:
 
         # Update edges within each label group
         for embedding_ids in label_to_embeddings.values():
-            print(f"connected embeddings {embedding_ids}")
+            # print(f"connected embeddings {embedding_ids}")
             self.update_edges_for_label(embedding_ids)
     
     def filter_graph(self, threshold):
